@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+}
+
+mainClassName = 'xen.Main'
+
+group 'xyz.xenus'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+shadowJar {
+    archiveFileName = "Xenus.${extension}"
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile 'io.github.cdimascio:java-dotenv:5.2.1'
+    compile 'org.yaml:snakeyaml:1.26'
+    compile 'net.dv8tion:JDA:4.2.0_189'
+    compile 'org.mongodb:mongodb-driver-sync:4.1.0'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+}
