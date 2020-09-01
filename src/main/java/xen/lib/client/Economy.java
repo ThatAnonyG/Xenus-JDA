@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import xen.lib.mongodb.DBManager;
 import xen.lib.mongodb.guild.GuildModel;
 import xen.lib.mongodb.member.MemberModel;
@@ -13,7 +14,6 @@ import xen.lib.utils.Utils;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class Economy {
@@ -25,7 +25,7 @@ public class Economy {
     this.client = client;
   }
 
-  public static List<Member> sortXP(DBManager dbManager, Guild guild) {
+  public static @NotNull List<Member> sortXP(DBManager dbManager, @NotNull Guild guild) {
     Member[] sorted = guild.getMembers()
             .stream()
             .filter((m) -> dbManager.find(m) != null)
@@ -34,10 +34,10 @@ public class Economy {
     Arrays.sort(
             sorted,
             (m1, m2) -> {
-              long xp1 = ((MemberModel) Objects.requireNonNull(dbManager.find(m1)))
+              long xp1 = ((MemberModel) dbManager.find(m1))
                       .getEconomy()
                       .getXp();
-              long xp2 = ((MemberModel) Objects.requireNonNull(dbManager.find(m2)))
+              long xp2 = ((MemberModel) dbManager.find(m2))
                       .getEconomy()
                       .getXp();
 
@@ -56,7 +56,7 @@ public class Economy {
     return client;
   }
 
-  public MemberModel genXP(GuildModel guildDB, MemberModel memberDB) {
+  public MemberModel genXP(GuildModel guildDB, @NotNull MemberModel memberDB) {
     memberDB.getEconomy().setCd(Calendar.getInstance().getTimeInMillis() + 60000);
     if (Math.random() * 100 < 50) return (MemberModel) client.getDbManager().save(memberDB);
 
@@ -75,7 +75,7 @@ public class Economy {
     List<Member> xpSorted = sortXP(client.getDbManager(), guild);
 
     if (
-            Utils.isManageable(guild.getSelfMember(), member) &&
+            guild.getSelfMember().canInteract(member) &&
                     xpSorted.contains(member) &&
                     xpSorted.get(0) == member &&
                     xpLead != null &&
@@ -105,7 +105,7 @@ public class Economy {
     return (MemberModel) client.getDbManager().save(memberDB);
   }
 
-  public UserModel genCoin(GuildModel guildDB, UserModel userDB) {
+  public UserModel genCoin(GuildModel guildDB, @NotNull UserModel userDB) {
     userDB.getEconomy().setCd(Calendar.getInstance().getTimeInMillis() + 120000);
     if (Math.random() * 100 < 30) return (UserModel) client.getDbManager().save(userDB);
 

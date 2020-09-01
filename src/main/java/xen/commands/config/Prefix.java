@@ -1,6 +1,7 @@
 package xen.commands.config;
 
 import net.dv8tion.jda.api.Permission;
+import org.jetbrains.annotations.NotNull;
 import xen.lib.command.Command;
 import xen.lib.command.CommandContext;
 import xen.lib.mongodb.guild.GuildModel;
@@ -11,14 +12,14 @@ public class Prefix extends Command {
 
   public Prefix() {
     super("prefix");
-    setCategory("Config");
+    setCategory(Categories.CONFIG);
     setDescription("Lets you to change the bot prefix.");
     setUsage("<New Value>");
     setPerms(new Permission[]{Permission.ADMINISTRATOR});
   }
 
   @Override
-  public void run(CommandContext ctx) {
+  public void run(@NotNull CommandContext ctx) {
     guildModel = (GuildModel) ctx
             .getClient()
             .getDbManager()
@@ -28,7 +29,7 @@ public class Prefix extends Command {
     if (prefix.length() > 5) {
       Utils.sendEm(
               ctx.getEvent().getChannel(),
-              ctx.getClient().getCross().getAsMention() + " Prefix must have less than 6 letters!",
+              ctx.getClient().getCross() + " Prefix must have less than 6 letters!",
               Utils.Embeds.ERROR
       ).queue();
       return;
@@ -37,11 +38,16 @@ public class Prefix extends Command {
     guildModel.setPrefix(prefix);
     guildModel = (GuildModel) ctx.getClient().getDbManager().save(guildModel);
 
-    Utils.sendLog(ctx.getEvent(), guildModel, Utils.Logs.MOD, "Lol", "Lol");
+    Utils.sendConfigLog(
+            ctx.getEvent(),
+            guildModel,
+            "Prefix Changed",
+            "Prefix changed to `" + prefix + "`"
+    );
 
     Utils.sendEm(
             ctx.getEvent().getChannel(),
-            ctx.getClient().getTick().getAsMention() +
+            ctx.getClient().getTick() +
                     " Prefix has been changed to `" +
                     guildModel.getPrefix() +
                     "`!",

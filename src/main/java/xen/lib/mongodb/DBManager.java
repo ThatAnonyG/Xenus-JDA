@@ -140,6 +140,7 @@ public class DBManager {
                 .projection(excludeId())
                 .first();
     }
+
     return null;
   }
 
@@ -168,6 +169,7 @@ public class DBManager {
         MongoCollection<UserModel> users = db.getCollection("users", UserModel.class);
         return users.findOneAndReplace(eq("uid", user.getUid()), user, options);
     }
-    return obj;
+
+    return null;
   }
 }

@@ -1,5 +1,6 @@
 package xen.events;
 
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.GenericEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,8 +29,13 @@ public class EReady implements BaseEvent {
 
   @Override
   public void handle(@NotNull GenericEvent event) {
-    client.setTick(event.getJDA().getEmoteById("694496723799638056"));
-    client.setCross(event.getJDA().getEmoteById("694496773451808798"));
+    client.setStartTime(System.currentTimeMillis());
+
+    Emote tick = event.getJDA().getEmoteById("694496723799638056");
+    if (tick != null) client.setTick(tick.getAsMention());
+
+    Emote cross = event.getJDA().getEmoteById("694496773451808798");
+    if (cross != null) client.setCross(cross.getAsMention());
 
     LOG.info(
             event

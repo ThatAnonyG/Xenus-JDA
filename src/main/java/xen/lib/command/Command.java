@@ -4,14 +4,14 @@ import net.dv8tion.jda.api.Permission;
 
 public class Command {
   private final String name;
-  private String[] aliases = {};
+  private String[] aliases = new String[]{};
   private boolean premium = false;
   private long cd = 0;
-  private String category = "Info";
-  private String description = "A cool command!";
+  private Categories category = Categories.INFO;
+  private String description = "A cool command.";
   private String usage = "Try using the command";
-  private Permission[] perms = {};
-  private Permission[] botPerms = {};
+  private Permission[] perms = new Permission[]{};
+  private Permission[] botPerms = new Permission[]{};
 
   public Command(String name) {
     this.name = name;
@@ -45,11 +45,11 @@ public class Command {
     this.cd = cd;
   }
 
-  public String getCategory() {
+  public Categories getCategory() {
     return category;
   }
 
-  public void setCategory(String category) {
+  public void setCategory(Categories category) {
     this.category = category;
   }
 
@@ -86,5 +86,17 @@ public class Command {
   }
 
   public void run(CommandContext ctx) {
+  }
+
+  public enum Categories {
+    ANIME,
+    CONFIG,
+    DEV,
+    ECONOMY,
+    FUN,
+    INFO,
+    MODERATION,
+    MUSIC,
+    UTILS
   }
 }

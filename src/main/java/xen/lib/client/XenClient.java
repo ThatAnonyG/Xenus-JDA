@@ -3,15 +3,16 @@ package xen.lib.client;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xen.commands.config.AddMod;
 import xen.commands.config.Prefix;
 import xen.commands.info.Help;
+import xen.commands.info.Info;
 import xen.commands.info.Ping;
 import xen.events.BaseEvent;
 import xen.events.EMessage;
@@ -33,10 +34,11 @@ public class XenClient {
   private final ConfigDao config = new Config().load().getConfig();
   private final DBManager dbManager = new DBManager(config.getMongoDao().getUri());
   private final Logger LOG = LoggerFactory.getLogger(XenClient.class);
-  private Emote tick;
-  private Emote cross;
-  private Emote premium;
-  private Emote dev;
+  private long startTime;
+  private String tick;
+  private String cross;
+  private String premium;
+  private String dev;
   private JDA api;
 
   public XenClient() {
@@ -48,6 +50,7 @@ public class XenClient {
     registerCommands(new Command[]{
             // Config
             new Prefix(),
+            new AddMod(),
 
             // Dev
 
@@ -56,8 +59,9 @@ public class XenClient {
             // Fun
 
             // Info
-            new Ping(),
-            new Help()
+            new Help(),
+            new Info(),
+            new Ping()
 
             // Moderation
 
@@ -85,35 +89,43 @@ public class XenClient {
     return dbManager;
   }
 
-  public Emote getTick() {
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
+
+  public String getTick() {
     return tick;
   }
 
-  public void setTick(Emote tick) {
+  public void setTick(String tick) {
     this.tick = tick;
   }
 
-  public Emote getCross() {
+  public String getCross() {
     return cross;
   }
 
-  public void setCross(Emote cross) {
+  public void setCross(String cross) {
     this.cross = cross;
   }
 
-  public Emote getPremium() {
+  public String getPremium() {
     return premium;
   }
 
-  public void setPremium(Emote premium) {
+  public void setPremium(String premium) {
     this.premium = premium;
   }
 
-  public Emote getDev() {
+  public String getDev() {
     return dev;
   }
 
-  public void setDev(Emote dev) {
+  public void setDev(String dev) {
     this.dev = dev;
   }
 

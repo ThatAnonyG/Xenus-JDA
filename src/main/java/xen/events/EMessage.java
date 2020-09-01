@@ -121,7 +121,7 @@ public class EMessage implements BaseEvent {
         if (oldCmd.isPresent() && oldCmd.get().getCd() > Calendar.getInstance().getTimeInMillis()) {
           Utils.sendEm(
                   event.getChannel(),
-                  client.getCross().getAsMention() + " You can use this command again after sometime!",
+                  client.getCross() + " You can use this command again after sometime!",
                   Utils.Embeds.ERROR
           ).queue();
           return;
