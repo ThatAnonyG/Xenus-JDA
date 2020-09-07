@@ -15,7 +15,7 @@ repositories {
 }
 
 shadowJar {
-    archiveFileName = "Xenus.${extension}"
+    archiveFileName = "Xenus.jar"
 }
 
 dependencies {

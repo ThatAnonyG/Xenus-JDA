@@ -45,6 +45,15 @@ public class Utils {
     return channel.sendMessage(embed);
   }
 
+  public static @NotNull EmbedBuilder embed() {
+    return new EmbedBuilder()
+            .setFooter(
+                    "Powered by VorteK Academy",
+                    "https://cdn.discordapp.com/avatars/595290375401242634/a01bcd12db4d609cc6f8a18a338ad2a9.png?size=320"
+            )
+            .setTimestamp(new Date().toInstant());
+  }
+
   public static void sendModLog(
           @NotNull GuildMessageReceivedEvent event,
           @NotNull GuildModel guildModel,
@@ -52,7 +61,7 @@ public class Utils {
           String reason,
           @NotNull User user
   ) {
-    EmbedBuilder logEmbed = new EmbedBuilder()
+    EmbedBuilder logEmbed = embed()
             .setTitle(title)
             .setColor(getHex())
             .addField("User", user.getAsTag() + " | " + user.getId(), false)
@@ -61,12 +70,7 @@ public class Utils {
                     event.getAuthor().getAsTag() + " | " + event.getAuthor().getId(),
                     false
             )
-            .addField("Reason", reason, false)
-            .setTimestamp(new Date().toInstant())
-            .setFooter(
-                    event.getJDA().getSelfUser().getName(),
-                    event.getJDA().getSelfUser().getAvatarUrl()
-            );
+            .addField("Reason", reason, false);
 
     TextChannel channel = event.getGuild().getTextChannelById(guildModel.getIds().getLogs());
     if (channel == null) return;
@@ -80,7 +84,7 @@ public class Utils {
           String title,
           String details
   ) {
-    EmbedBuilder logEmbed = new EmbedBuilder()
+    EmbedBuilder logEmbed = embed()
             .setTitle(title)
             .setColor(getHex())
             .addField(
@@ -88,12 +92,7 @@ public class Utils {
                     event.getAuthor().getAsTag() + " | " + event.getAuthor().getId(),
                     false
             )
-            .addField("Action", details, false)
-            .setTimestamp(new Date().toInstant())
-            .setFooter(
-                    event.getJDA().getSelfUser().getName(),
-                    event.getJDA().getSelfUser().getAvatarUrl()
-            );
+            .addField("Action", details, false);
 
     TextChannel channel = event.getGuild().getTextChannelById(guildModel.getIds().getLogs());
     if (channel == null) return;

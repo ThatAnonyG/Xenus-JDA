@@ -92,8 +92,8 @@ public class EMessage implements BaseEvent {
     Command command = client.getCommand(invoker);
     if (command == null) return;
 
-    if (!Arrays.asList("dev", "config", "info").contains(command.getCategory().toLowerCase()) &&
-            !guildDB.getEnabled().contains(command.getCategory())
+    if (!Arrays.asList("dev", "config", "info").contains(command.getCategory().name().toLowerCase()) &&
+            !guildDB.getEnabled().contains(command.getCategory().name().toLowerCase())
     ) return;
 
     if (!userDB.getBadges().isPremium() && command.isPremium()) {

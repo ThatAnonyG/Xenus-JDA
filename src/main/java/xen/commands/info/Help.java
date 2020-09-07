@@ -8,7 +8,6 @@ import xen.lib.mongodb.guild.GuildModel;
 import xen.lib.utils.Utils;
 
 import java.util.Arrays;
-import java.util.Date;
 
 public class Help extends Command {
   private GuildModel guildModel;
@@ -29,7 +28,7 @@ public class Help extends Command {
             .find(ctx.getEvent().getGuild());
 
     if (ctx.getArgs().size() == 0) {
-      EmbedBuilder embed = new EmbedBuilder()
+      EmbedBuilder embed = Utils.embed()
               .setTitle(ctx.getEvent().getJDA().getSelfUser().getName() + " Help")
               .setColor(Utils.getHex())
               .setDescription(
@@ -50,11 +49,6 @@ public class Help extends Command {
                               "[Donate via PayPal](https://paypal.me/ratul003)"
                       ),
                       false
-              )
-              .setTimestamp(new Date().toInstant())
-              .setFooter(
-                      ctx.getEvent().getJDA().getSelfUser().getName(),
-                      ctx.getEvent().getJDA().getSelfUser().getAvatarUrl()
               );
 
       ctx.getEvent().getAuthor().openPrivateChannel().queue(
@@ -119,13 +113,12 @@ public class Help extends Command {
                             "`None`")
     );
 
-    EmbedBuilder embed = new EmbedBuilder()
+    EmbedBuilder embed = Utils.embed()
             .setTitle("Command Help and Info")
             .setColor(Utils.getHex())
             .addField("General Info", genInfo.trim(), false)
             .addField("Permissions Needed", perms.trim(), false)
             .addField("Usage", "```" + cmd.getUsage() + "```", false)
-            .setTimestamp(new Date().toInstant())
             .setFooter(
                     "Syntax: <> = Required | [] = Optional",
                     ctx.getEvent().getJDA().getSelfUser().getAvatarUrl()

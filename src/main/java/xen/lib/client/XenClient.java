@@ -9,8 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xen.commands.config.AddMod;
+import xen.commands.config.ModRole;
 import xen.commands.config.Prefix;
+import xen.commands.config.Tag;
 import xen.commands.info.Help;
 import xen.commands.info.Info;
 import xen.commands.info.Ping;
@@ -49,8 +50,9 @@ public class XenClient {
     });
     registerCommands(new Command[]{
             // Config
+            new ModRole(),
             new Prefix(),
-            new AddMod(),
+            new Tag(),
 
             // Dev
 
