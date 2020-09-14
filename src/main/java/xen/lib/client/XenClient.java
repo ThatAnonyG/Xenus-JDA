@@ -9,9 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xen.commands.config.ModRole;
-import xen.commands.config.Prefix;
-import xen.commands.config.Tag;
+import xen.commands.config.*;
 import xen.commands.info.Help;
 import xen.commands.info.Info;
 import xen.commands.info.Ping;
@@ -35,24 +33,37 @@ public class XenClient {
   private final ConfigDao config = new Config().load().getConfig();
   private final DBManager dbManager = new DBManager(config.getMongoDao().getUri());
   private final Logger LOG = LoggerFactory.getLogger(XenClient.class);
+  private JDA api;
+  private Economy ecoModule;
   private long startTime;
   private String tick;
   private String cross;
   private String premium;
   private String dev;
-  private JDA api;
 
   public XenClient() {
     this.token = config.getBotDao().getToken();
-    registerEvent(new BaseEvent[]{
+    registerEvents(new BaseEvent[]{
             new EReady(this),
             new EMessage(this)
     });
     registerCommands(new Command[]{
             // Config
+            new ChannelXP(),
+            new CoinAlert(),
+            new DefaultRole(),
+            new LeaveChannel(),
+            new LogChannel(),
+            new MessageDelete(),
             new ModRole(),
             new Prefix(),
+            new ReportChannel(),
             new Tag(),
+            new Toggle(),
+            new TopRole(),
+            new WelcomeChannel(),
+            new WelcomeText(),
+            new XPRate(),
 
             // Dev
 
@@ -89,6 +100,15 @@ public class XenClient {
 
   public DBManager getDbManager() {
     return dbManager;
+  }
+
+  @Nullable
+  public JDA getApi() {
+    return api;
+  }
+
+  public Economy getEcoModule() {
+    return ecoModule;
   }
 
   public long getStartTime() {
@@ -131,11 +151,6 @@ public class XenClient {
     this.dev = dev;
   }
 
-  @Nullable
-  public JDA getApi() {
-    return api;
-  }
-
   public void build() throws LoginException {
     dbManager.login(config.getMongoDao().getDb());
     api = JDABuilder
@@ -154,9 +169,10 @@ public class XenClient {
             .addEventListeners(new EventHandler(this))
             .setActivity(Activity.watching("https://xenus.xyz/"))
             .build();
+    ecoModule = new Economy(this);
   }
 
-  private void registerEvent(@NotNull BaseEvent[] evtArr) {
+  private void registerEvents(@NotNull BaseEvent[] evtArr) {
     for (BaseEvent event : evtArr) {
       if (commands.containsKey(event.getName())) {
         LOG.info(event.getName() + ": Event already registered!");

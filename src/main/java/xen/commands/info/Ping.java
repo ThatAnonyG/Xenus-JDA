@@ -1,9 +1,9 @@
 package xen.commands.info;
 
 import org.jetbrains.annotations.NotNull;
+import xen.lib.Utils;
 import xen.lib.command.Command;
 import xen.lib.command.CommandContext;
-import xen.lib.utils.Utils;
 
 public class Ping extends Command {
   public Ping() {

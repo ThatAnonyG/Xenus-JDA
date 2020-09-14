@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import xen.lib.Utils;
 import xen.lib.mongodb.DBManager;
 import xen.lib.mongodb.guild.GuildModel;
 import xen.lib.mongodb.member.MemberModel;
 import xen.lib.mongodb.user.UserModel;
-import xen.lib.utils.Utils;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -17,11 +17,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Economy {
-  private final GuildMessageReceivedEvent event;
   private final XenClient client;
 
-  public Economy(GuildMessageReceivedEvent event, XenClient client) {
-    this.event = event;
+  public Economy(XenClient client) {
     this.client = client;
   }
 
@@ -48,15 +46,13 @@ public class Economy {
     return Arrays.asList(sorted);
   }
 
-  public GuildMessageReceivedEvent getEvent() {
-    return event;
-  }
-
   public XenClient getClient() {
     return client;
   }
 
-  public MemberModel genXP(GuildModel guildDB, @NotNull MemberModel memberDB) {
+  public MemberModel genXP(
+          GuildMessageReceivedEvent event, GuildModel guildDB, @NotNull MemberModel memberDB
+  ) {
     memberDB.getEconomy().setCd(Calendar.getInstance().getTimeInMillis() + 60000);
     if (Math.random() * 100 < 50) return (MemberModel) client.getDbManager().save(memberDB);
 
@@ -105,18 +101,21 @@ public class Economy {
     return (MemberModel) client.getDbManager().save(memberDB);
   }
 
-  public UserModel genCoin(GuildModel guildDB, @NotNull UserModel userDB) {
+  public UserModel genCoin(
+          GuildMessageReceivedEvent event, GuildModel guildDB, @NotNull UserModel userDB
+  ) {
     userDB.getEconomy().setCd(Calendar.getInstance().getTimeInMillis() + 120000);
     if (Math.random() * 100 < 30) return (UserModel) client.getDbManager().save(userDB);
 
     byte coins = (byte) (Math.floor(Math.random() * 9) + 10);
     userDB.getEconomy().setCoins(userDB.getEconomy().getCoins() + coins);
 
-    if (guildDB.getEconomy().isCoinAlert()) Utils.sendEm(
-            event.getChannel(),
-            "GG **" + event.getAuthor().getName() + "**! You earned `" + coins + "` coins!",
-            Utils.Embeds.BASE
-    ).queue((m) -> m.delete().queueAfter(3000, TimeUnit.MILLISECONDS));
+    if (guildDB.getEconomy().isCoinAlert())
+      Utils.sendEm(
+              event.getChannel(),
+              "GG **" + event.getAuthor().getName() + "**! You earned `" + coins + "` coins!",
+              Utils.Embeds.BASE
+      ).queue((m) -> m.delete().queueAfter(3000, TimeUnit.MILLISECONDS));
 
     return (UserModel) client.getDbManager().save(userDB);
   }

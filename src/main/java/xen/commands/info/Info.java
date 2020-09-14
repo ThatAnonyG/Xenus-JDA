@@ -2,9 +2,9 @@ package xen.commands.info;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.jetbrains.annotations.NotNull;
+import xen.lib.Utils;
 import xen.lib.command.Command;
 import xen.lib.command.CommandContext;
-import xen.lib.utils.Utils;
 
 public class Info extends Command {
   public Info() {

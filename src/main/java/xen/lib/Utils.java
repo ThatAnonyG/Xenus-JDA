@@ -1,4 +1,4 @@
-package xen.lib.utils;
+package xen.lib;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -6,11 +6,13 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.utils.MiscUtil;
 import org.jetbrains.annotations.NotNull;
 import xen.lib.mongodb.guild.GuildModel;
 
 import java.awt.*;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 public class Utils {
   public static @NotNull Color getHex() {
@@ -28,6 +30,40 @@ public class Utils {
   public static @NotNull Color getProHex() {
     return Color.decode("#00a6ed");
   }
+
+  public static boolean isSnowflake(String input) {
+    try {
+      MiscUtil.parseSnowflake(input);
+      return true;
+    } catch (Throwable error) {
+      return false;
+    }
+  }
+
+  public static boolean isInteger(String input) {
+    try {
+      Integer.parseInt(input);
+      return true;
+    } catch (Throwable error) {
+      return false;
+    }
+  }
+
+  public static boolean isFloat(String input) {
+    try {
+      Float.parseFloat(input);
+      return true;
+    } catch (Throwable error) {
+      return false;
+    }
+  }
+
+  public static boolean partialMatch(String args, String toFind) {
+    String formatted = String.join(".*", args.split(" "));
+    return Pattern.compile(".*" + formatted + ".*", Pattern.CASE_INSENSITIVE)
+            .matcher(toFind).matches();
+  }
+
 
   public static @NotNull MessageAction sendEm(
           @NotNull TextChannel channel,
@@ -47,10 +83,7 @@ public class Utils {
 
   public static @NotNull EmbedBuilder embed() {
     return new EmbedBuilder()
-            .setFooter(
-                    "Powered by VorteK Academy",
-                    "https://cdn.discordapp.com/avatars/595290375401242634/a01bcd12db4d609cc6f8a18a338ad2a9.png?size=320"
-            )
+            .setFooter("Powered by VorteK Academy", "https://imgur.com/orfFkI6.png")
             .setTimestamp(new Date().toInstant());
   }
 
@@ -72,6 +105,7 @@ public class Utils {
             )
             .addField("Reason", reason, false);
 
+    if (guildModel.getIds().getLogs().length() < 1) return;
     TextChannel channel = event.getGuild().getTextChannelById(guildModel.getIds().getLogs());
     if (channel == null) return;
 
@@ -94,6 +128,7 @@ public class Utils {
             )
             .addField("Action", details, false);
 
+    if (guildModel.getIds().getLogs().length() < 1) return;
     TextChannel channel = event.getGuild().getTextChannelById(guildModel.getIds().getLogs());
     if (channel == null) return;
 

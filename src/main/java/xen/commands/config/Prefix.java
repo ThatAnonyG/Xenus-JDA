@@ -2,10 +2,10 @@ package xen.commands.config;
 
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
+import xen.lib.Utils;
 import xen.lib.command.Command;
 import xen.lib.command.CommandContext;
 import xen.lib.mongodb.guild.GuildModel;
-import xen.lib.utils.Utils;
 
 public class Prefix extends Command {
   private GuildModel guildModel;
@@ -20,11 +20,16 @@ public class Prefix extends Command {
 
   @Override
   public void run(@NotNull CommandContext ctx) {
-    guildModel = (GuildModel) ctx
-            .getClient()
-            .getDbManager()
-            .find(ctx.getEvent().getGuild());
+    guildModel = (GuildModel) ctx.getClient().getDbManager().find(ctx.getEvent().getGuild());
 
+    if (ctx.getArgs().isEmpty()) {
+      Utils.sendEm(
+              ctx.getEvent().getChannel(),
+              ctx.getClient().getCross() + " Please provide a new prefix value!",
+              Utils.Embeds.ERROR
+      ).queue();
+      return;
+    }
     String prefix = ctx.getArgs().get(0);
     if (prefix.length() > 5) {
       Utils.sendEm(
@@ -34,16 +39,17 @@ public class Prefix extends Command {
       ).queue();
       return;
     }
+    if (prefix.equals(guildModel.getPrefix())) {
+      Utils.sendEm(
+              ctx.getEvent().getChannel(),
+              ctx.getClient().getCross() + " New prefix cannot be same as old one!",
+              Utils.Embeds.ERROR
+      ).queue();
+      return;
+    }
 
     guildModel.setPrefix(prefix);
     guildModel = (GuildModel) ctx.getClient().getDbManager().save(guildModel);
-
-    Utils.sendConfigLog(
-            ctx.getEvent(),
-            guildModel,
-            "Prefix Changed",
-            "Prefix changed to `" + prefix + "`"
-    );
 
     Utils.sendEm(
             ctx.getEvent().getChannel(),
@@ -53,5 +59,11 @@ public class Prefix extends Command {
                     "`!",
             Utils.Embeds.SUCCESS
     ).queue();
+    Utils.sendConfigLog(
+            ctx.getEvent(),
+            guildModel,
+            "Prefix Changed",
+            "Prefix changed to `" + prefix + "`"
+    );
   }
 }

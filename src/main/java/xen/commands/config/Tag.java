@@ -1,11 +1,11 @@
 package xen.commands.config;
 
 import net.dv8tion.jda.api.Permission;
+import xen.lib.Utils;
 import xen.lib.command.Command;
 import xen.lib.command.CommandContext;
 import xen.lib.mongodb.guild.GuildModel;
 import xen.lib.mongodb.guild.Tags;
-import xen.lib.utils.Utils;
 
 import java.util.Arrays;
 
@@ -22,24 +22,17 @@ public class Tag extends Command {
 
   @Override
   public void run(CommandContext ctx) {
-    guildModel = (GuildModel) ctx
-            .getClient()
-            .getDbManager()
-            .find(ctx.getEvent().getGuild());
+    guildModel = (GuildModel) ctx.getClient().getDbManager().find(ctx.getEvent().getGuild());
 
-    if (!Arrays.asList("add", "del").contains(ctx.getArgs().get(0).toLowerCase()))
+    if (
+            ctx.getArgs().isEmpty() ||
+                    !Arrays.asList("add", "del").contains(ctx.getArgs().get(0).toLowerCase())
+    )
       ctx.getArgs().add(0, "add");
 
     switch (ctx.getArgs().get(0).toLowerCase()) {
       case "add" -> {
-        String name = ctx.getArgs().get(1);
-        String desc = String.join(
-                " ",
-                Arrays.copyOfRange(
-                        ctx.getArgs().toArray(String[]::new), 2, ctx.getArgs().size()
-                )
-        );
-        if (name == null || desc.length() == 0) {
+        if (ctx.getArgs().size() < 2) {
           Utils.sendEm(
                   ctx.getEvent().getChannel(),
                   ctx.getClient().getCross() + " No tag name/description provided!",
@@ -47,6 +40,13 @@ public class Tag extends Command {
           ).queue();
           return;
         }
+        String name = ctx.getArgs().get(1);
+        String desc = String.join(
+                " ",
+                Arrays.copyOfRange(
+                        ctx.getArgs().toArray(String[]::new), 2, ctx.getArgs().size()
+                )
+        );
 
         Tags tag = new Tags();
         tag.setName(name);
@@ -62,8 +62,7 @@ public class Tag extends Command {
       }
 
       case "del" -> {
-        String name = ctx.getArgs().get(1);
-        if (name == null) {
+        if (ctx.getArgs().size() < 1) {
           Utils.sendEm(
                   ctx.getEvent().getChannel(),
                   ctx.getClient().getCross() + " No tag name provided!",
@@ -71,6 +70,7 @@ public class Tag extends Command {
           ).queue();
           return;
         }
+        String name = ctx.getArgs().get(1);
 
         guildModel.getTags().remove(
                 guildModel.getTags().stream().filter(

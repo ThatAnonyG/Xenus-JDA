@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
-import xen.lib.client.Economy;
+import xen.lib.Utils;
 import xen.lib.client.XenClient;
 import xen.lib.command.Command;
 import xen.lib.command.CommandContext;
@@ -14,12 +14,11 @@ import xen.lib.mongodb.guild.GuildModel;
 import xen.lib.mongodb.member.CD;
 import xen.lib.mongodb.member.MemberModel;
 import xen.lib.mongodb.user.UserModel;
-import xen.lib.utils.Utils;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static xen.lib.utils.Utils.sendEm;
+import static xen.lib.Utils.sendEm;
 
 public class EMessage implements BaseEvent {
   private final XenClient client;
@@ -45,7 +44,7 @@ public class EMessage implements BaseEvent {
 
   @Override
   public void handle(@NotNull GenericEvent rawEvent) {
-    GuildMessageReceivedEvent event = ((GuildMessageReceivedEvent) rawEvent);
+    GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) rawEvent;
     Message message = event.getMessage();
     if (event.getAuthor().isBot()) return;
     if (event.isWebhookMessage()) return;
@@ -58,15 +57,14 @@ public class EMessage implements BaseEvent {
     userDB = (UserModel) client.getDbManager().find(event.getAuthor());
     memberDB = (MemberModel) client.getDbManager().find(event.getMember());
 
-    Economy ecoModule = new Economy(event, client);
     if (
             memberDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis() &&
                     guildDB.getEnabled().contains("xp") &&
                     !guildDB.getEconomy().getBlocked().contains(message.getChannel().getId())
     )
-      memberDB = ecoModule.genXP(guildDB, memberDB);
+      memberDB = client.getEcoModule().genXP(event, guildDB, memberDB);
     if (userDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis())
-      userDB = ecoModule.genCoin(guildDB, userDB);
+      userDB = client.getEcoModule().genCoin(event, guildDB, userDB);
 
     if (message.getContentRaw().matches("^<@!?" +
             event.getJDA().getSelfUser().getId() +
@@ -95,6 +93,14 @@ public class EMessage implements BaseEvent {
     if (!Arrays.asList("dev", "config", "info").contains(command.getCategory().name().toLowerCase()) &&
             !guildDB.getEnabled().contains(command.getCategory().name().toLowerCase())
     ) return;
+    if (Arrays.asList("moderation", "config").contains(command.getCategory().name().toLowerCase()) &&
+            guildDB.isMsgDelete()
+    ) {
+      try {
+        message.delete().queue();
+      } catch (Throwable ignored) {
+      }
+    }
 
     if (!userDB.getBadges().isPremium() && command.isPremium()) {
       sendEm(event.getChannel(),
