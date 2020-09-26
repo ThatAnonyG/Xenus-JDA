@@ -1,0 +1,69 @@
+package xyz.xenus.commands.config;
+
+import net.dv8tion.jda.api.Permission;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenus.lib.Utils;
+import xyz.xenus.lib.command.Command;
+import xyz.xenus.lib.command.CommandContext;
+import xyz.xenus.lib.mongodb.guild.GuildModel;
+
+public class Prefix extends Command {
+  public Prefix() {
+    super("prefix");
+    setCategory(Categories.CONFIG);
+    setDescription("Lets you to change the bot prefix.");
+    setUsage("<New Value>");
+    setPerms(new Permission[]{Permission.ADMINISTRATOR});
+  }
+
+  @Override
+  public void run(@NotNull CommandContext ctx) {
+    GuildModel guildModel = (GuildModel) ctx.getClient().getDbManager().find(
+            ctx.getEvent().getGuild()
+    );
+
+    if (ctx.getArgs().isEmpty()) {
+      Utils.sendEm(
+              ctx.getEvent().getChannel(),
+              ctx.getClient().getCross() + " Please provide a new prefix value!",
+              Utils.Embeds.ERROR
+      ).queue();
+      return;
+    }
+    String prefix = ctx.getArgs().get(0);
+    if (prefix.length() > 5) {
+      Utils.sendEm(
+              ctx.getEvent().getChannel(),
+              ctx.getClient().getCross() + " Prefix must have less than 6 letters!",
+              Utils.Embeds.ERROR
+      ).queue();
+      return;
+    }
+    if (prefix.equals(guildModel.getPrefix())) {
+      Utils.sendEm(
+              ctx.getEvent().getChannel(),
+              ctx.getClient().getCross() + " New prefix cannot be same as old one!",
+              Utils.Embeds.ERROR
+      ).queue();
+      return;
+    }
+
+    guildModel.setPrefix(prefix);
+    guildModel = (GuildModel) ctx.getClient().getDbManager().save(guildModel);
+
+    Utils.sendEm(
+            ctx.getEvent().getChannel(),
+            ctx.getClient().getTick() +
+                    " Prefix has been changed to `" +
+                    guildModel.getPrefix() +
+                    "`!",
+            Utils.Embeds.SUCCESS
+    ).queue();
+    Utils.sendConfigLog(
+            ctx.getEvent(),
+            guildModel,
+            "Prefix Changed",
+            "Prefix changed to `" + prefix + "`"
+    );
+  }
+}

@@ -4,7 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
-mainClassName = 'xen.Main'
+mainClassName = 'xyz.xenus.Main'
 
 group 'xyz.xenus'
 version '1.0.0'
@@ -15,15 +15,17 @@ repositories {
 }
 
 shadowJar {
-    archiveFileName = "Xenus.jar"
+    archiveFileName = "Xenus-${project.version}.jar"
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit',
+            version: '4.12'
 
-    compile 'io.github.cdimascio:java-dotenv:5.2.1'
-    compile 'org.yaml:snakeyaml:1.26'
-    compile 'net.dv8tion:JDA:4.2.0_189'
-    compile 'org.mongodb:mongodb-driver-sync:4.1.0'
-    compile 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'io.github.cdimascio:java-dotenv:5.2.1'
+    implementation 'org.yaml:snakeyaml:1.26'
+    implementation 'net.dv8tion:JDA:4.2.0_189'
+    implementation 'org.mongodb:mongodb-driver-sync:4.1.0'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
