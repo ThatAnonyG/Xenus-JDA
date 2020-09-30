@@ -1,6 +1,4 @@
 .*/
 build/
-gradle/
-launch4j/
 src/main/resources/.env
 src/main/resources/*.yml

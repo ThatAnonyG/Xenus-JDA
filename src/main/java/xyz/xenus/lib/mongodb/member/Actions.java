@@ -1,31 +1,31 @@
 package xyz.xenus.lib.mongodb.member;
 
 public class Actions {
-  private String mod = "";
-  private String reason = "";
-  private int date = 0;
+    private String mod = "";
+    private String reason = "";
+    private int date = 0;
 
-  public String getMod() {
-    return mod;
-  }
+    public String getMod() {
+        return mod;
+    }
 
-  public void setMod(String mod) {
-    this.mod = mod;
-  }
+    public void setMod(String mod) {
+        this.mod = mod;
+    }
 
-  public String getReason() {
-    return reason;
-  }
+    public String getReason() {
+        return reason;
+    }
 
-  public void setReason(String reason) {
-    this.reason = reason;
-  }
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
-  public int getDate() {
-    return date;
-  }
+    public int getDate() {
+        return date;
+    }
 
-  public void setDate(int date) {
-    this.date = date;
-  }
+    public void setDate(int date) {
+        this.date = date;
+    }
 }

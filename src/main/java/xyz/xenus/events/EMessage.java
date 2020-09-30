@@ -23,165 +23,165 @@ import java.util.regex.Pattern;
 import static xyz.xenus.lib.Utils.sendEm;
 
 public class EMessage implements BaseEvent {
-  private final XenClient client;
-  private final String name;
-  private GuildModel guildDB;
-  private UserModel userDB;
-  private MemberModel memberDB;
+    private final XenClient client;
+    private final String name;
+    private GuildModel guildDB;
+    private UserModel userDB;
+    private MemberModel memberDB;
 
-  public EMessage(XenClient client) {
-    this.client = client;
-    this.name = "GuildMessageReceivedEvent";
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public XenClient getClient() {
-    return client;
-  }
-
-  @Override
-  public void handle(@NotNull GenericEvent rawEvent) throws IOException, ParseException {
-    GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) rawEvent;
-    Message message = event.getMessage();
-    if (event.getAuthor().isBot()) return;
-    if (event.isWebhookMessage()) return;
-
-    client.getDbManager().init(event.getGuild());
-    client.getDbManager().init(event.getAuthor());
-    client.getDbManager().init(Objects.requireNonNull(event.getMember()));
-
-    guildDB = (GuildModel) client.getDbManager().find(event.getGuild());
-    userDB = (UserModel) client.getDbManager().find(event.getAuthor());
-    memberDB = (MemberModel) client.getDbManager().find(event.getMember());
-
-    if (
-            memberDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis() &&
-                    guildDB.getEnabled().contains("xp") &&
-                    !guildDB.getEconomy().getBlocked().contains(message.getChannel().getId())
-    )
-      memberDB = client.getEcoModule().genXP(event, guildDB, memberDB);
-    if (userDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis())
-      userDB = client.getEcoModule().genCoin(event, guildDB, userDB);
-
-    if (message.getContentRaw().matches("^<@!?" +
-            event.getJDA().getSelfUser().getId() +
-            ">( help)?$")
-    ) {
-      event
-              .getChannel()
-              .sendMessage("**Use `" + guildDB.getPrefix() + "help` for more help!**")
-              .queue();
-      return;
+    public EMessage(XenClient client) {
+        this.client = client;
+        this.name = "GuildMessageReceivedEvent";
     }
 
-    ArrayList<String> args = new ArrayList<>(
-            Arrays.asList(
-                    message
-                            .getContentRaw()
-                            .replaceFirst(Pattern.quote(guildDB.getPrefix()), "")
-                            .split("\\s+")
-            )
-    );
-
-    String invoker = args.remove(0);
-    Command command = client.getCommand(invoker);
-    if (command == null) return;
-
-    if (!Arrays.asList("dev", "config", "info").contains(command.getCategory().name().toLowerCase()) &&
-            !guildDB.getEnabled().contains(command.getCategory().name().toLowerCase())
-    ) return;
-    if (Arrays.asList("moderation", "config").contains(command.getCategory().name().toLowerCase()) &&
-            guildDB.isMsgDelete()
-    ) {
-      try {
-        message.delete().queue();
-      } catch (Throwable ignored) {
-      }
+    @Override
+    public String getName() {
+        return name;
     }
 
-    if (!userDB.getBadges().isPremium() && command.isPremium()) {
-      sendEm(event.getChannel(),
-              "Cool you found a premium feature! Become a premium user today and support our development!",
-              Utils.Embeds.PRO
-      ).queue();
+    @Override
+    public XenClient getClient() {
+        return client;
     }
 
-    if (
-            event.getGuild().getSelfMember().hasPermission(command.getBotPerms()) &&
-                    (event.getMember().hasPermission(command.getPerms()) ||
-                            Objects.requireNonNull(message.getMember()).getRoles().stream().anyMatch(
-                                    (x) -> guildDB.getIds().getAdminRoles().contains(x.getId())
-                            )
-                    )
-    ) {
-      if (command.getCd() > 0) {
-        Optional<CD> oldCmd = memberDB
-                .getCd()
-                .stream()
-                .filter((x) -> x.getName().equals(command.getName()))
-                .findFirst();
+    @Override
+    public void handle(@NotNull GenericEvent rawEvent) throws IOException, ParseException {
+        GuildMessageReceivedEvent event = (GuildMessageReceivedEvent) rawEvent;
+        Message message = event.getMessage();
+        if (event.getAuthor().isBot()) return;
+        if (event.isWebhookMessage()) return;
 
-        if (oldCmd.isPresent() && oldCmd.get().getCd() > Calendar.getInstance().getTimeInMillis()) {
-          Utils.sendEm(
-                  event.getChannel(),
-                  client.getCross() + " You can use this command again after sometime!",
-                  Utils.Embeds.ERROR
-          ).queue();
-          return;
-        } else {
-          CD newCmd = new CD();
-          newCmd.setName(command.getName());
-          newCmd.setCd(Calendar.getInstance().getTimeInMillis() + command.getCd());
+        client.getDbManager().init(event.getGuild());
+        client.getDbManager().init(event.getAuthor());
+        client.getDbManager().init(Objects.requireNonNull(event.getMember()));
 
-          oldCmd.ifPresent(cd -> memberDB.getCd().remove(cd));
-          memberDB.getCd().add(newCmd);
-          client.getDbManager().save(memberDB);
+        guildDB = (GuildModel) client.getDbManager().find(event.getGuild());
+        userDB = (UserModel) client.getDbManager().find(event.getAuthor());
+        memberDB = (MemberModel) client.getDbManager().find(event.getMember());
+
+        if (
+                memberDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis() &&
+                        guildDB.getEnabled().contains("xp") &&
+                        !guildDB.getEconomy().getBlocked().contains(message.getChannel().getId())
+        )
+            memberDB = client.getEcoModule().genXP(event, guildDB, memberDB);
+        if (userDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis())
+            userDB = client.getEcoModule().genCoin(event, guildDB, userDB);
+
+        if (message.getContentRaw().matches("^<@!?" +
+                event.getJDA().getSelfUser().getId() +
+                ">( help)?$")
+        ) {
+            event
+                    .getChannel()
+                    .sendMessage("**Use `" + guildDB.getPrefix() + "help` for more help!**")
+                    .queue();
+            return;
         }
-      }
-      command.run(new CommandContext(client, event, args));
-    } else {
-      String uPerms = command.getPerms().length > 0 ?
-              String.join(
-                      " | ",
-                      Arrays
-                              .stream(command.getPerms()).map((p) -> "`" + p.getName() + "`")
-                              .toArray(String[]::new)
-              ) :
-              "`None`";
-      String botPerms = command.getBotPerms().length > 0 ?
-              String.join(
-                      " | ",
-                      Arrays
-                              .stream(command.getBotPerms()).map((p) -> "`" + p.getName() + "`")
-                              .toArray(String[]::new)
-              ) :
-              "`None`";
 
-      MessageEmbed embed = new EmbedBuilder()
-              .setTitle("Not Enough Permissions")
-              .setColor(Utils.getRed())
-              .addField(
-                      "User Perms",
-                      "Users need the following permission(s) to run this command: " + uPerms,
-                      false
-              )
-              .addField(
-                      "Bot Perms",
-                      "I need the following permission(s) to run this command: " + botPerms,
-                      false
-              )
-              .setTimestamp(new Date().toInstant())
-              .setFooter(
-                      event.getJDA().getSelfUser().getName(),
-                      event.getJDA().getSelfUser().getAvatarUrl()
-              )
-              .build();
-      event.getChannel().sendMessage(embed).queue();
+        ArrayList<String> args = new ArrayList<>(
+                Arrays.asList(
+                        message
+                                .getContentRaw()
+                                .replaceFirst(Pattern.quote(guildDB.getPrefix()), "")
+                                .split("\\s+")
+                )
+        );
+
+        String invoker = args.remove(0);
+        Command command = client.getCommand(invoker);
+        if (command == null) return;
+
+        if (!Arrays.asList("dev", "config", "info").contains(command.getCategory().name().toLowerCase()) &&
+                !guildDB.getEnabled().contains(command.getCategory().name().toLowerCase())
+        ) return;
+        if (Arrays.asList("moderation", "config").contains(command.getCategory().name().toLowerCase()) &&
+                guildDB.isMsgDelete()
+        ) {
+            try {
+                message.delete().queue();
+            } catch (Throwable ignored) {
+            }
+        }
+
+        if (!userDB.getBadges().isPremium() && command.isPremium()) {
+            sendEm(event.getChannel(),
+                    "Cool you found a premium feature! Become a premium user today and support our development!",
+                    Utils.Embeds.PRO
+            ).queue();
+        }
+
+        if (
+                event.getGuild().getSelfMember().hasPermission(command.getBotPerms()) &&
+                        (event.getMember().hasPermission(command.getPerms()) ||
+                                Objects.requireNonNull(message.getMember()).getRoles().stream().anyMatch(
+                                        (x) -> guildDB.getIds().getAdminRoles().contains(x.getId())
+                                )
+                        )
+        ) {
+            if (command.getCd() > 0) {
+                Optional<CD> oldCmd = memberDB
+                        .getCd()
+                        .stream()
+                        .filter((x) -> x.getName().equals(command.getName()))
+                        .findFirst();
+
+                if (oldCmd.isPresent() && oldCmd.get().getCd() > Calendar.getInstance().getTimeInMillis()) {
+                    Utils.sendEm(
+                            event.getChannel(),
+                            client.getCross() + " You can use this command again after sometime!",
+                            Utils.Embeds.ERROR
+                    ).queue();
+                    return;
+                } else {
+                    CD newCmd = new CD();
+                    newCmd.setName(command.getName());
+                    newCmd.setCd(Calendar.getInstance().getTimeInMillis() + command.getCd());
+
+                    oldCmd.ifPresent(cd -> memberDB.getCd().remove(cd));
+                    memberDB.getCd().add(newCmd);
+                    client.getDbManager().save(memberDB);
+                }
+            }
+            command.run(new CommandContext(client, event, args, guildDB, userDB, memberDB));
+        } else {
+            String uPerms = command.getPerms().length > 0 ?
+                    String.join(
+                            " | ",
+                            Arrays
+                                    .stream(command.getPerms()).map((p) -> "`" + p.getName() + "`")
+                                    .toArray(String[]::new)
+                    ) :
+                    "`None`";
+            String botPerms = command.getBotPerms().length > 0 ?
+                    String.join(
+                            " | ",
+                            Arrays
+                                    .stream(command.getBotPerms()).map((p) -> "`" + p.getName() + "`")
+                                    .toArray(String[]::new)
+                    ) :
+                    "`None`";
+
+            MessageEmbed embed = new EmbedBuilder()
+                    .setTitle("Not Enough Permissions")
+                    .setColor(Utils.getRed())
+                    .addField(
+                            "User Perms",
+                            "Users need the following permission(s) to run this command: " + uPerms,
+                            false
+                    )
+                    .addField(
+                            "Bot Perms",
+                            "I need the following permission(s) to run this command: " + botPerms,
+                            false
+                    )
+                    .setTimestamp(new Date().toInstant())
+                    .setFooter(
+                            event.getJDA().getSelfUser().getName(),
+                            event.getJDA().getSelfUser().getAvatarUrl()
+                    )
+                    .build();
+            event.getChannel().sendMessage(embed).queue();
+        }
     }
-  }
 }

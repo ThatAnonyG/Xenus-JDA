@@ -7,9 +7,9 @@ import xyz.xenus.lib.client.XenClient;
 import java.io.IOException;
 
 public interface BaseEvent {
-  XenClient getClient();
+    XenClient getClient();
 
-  String getName();
+    String getName();
 
-  void handle(GenericEvent event) throws IOException, ParseException;
+    void handle(GenericEvent event) throws IOException, ParseException;
 }

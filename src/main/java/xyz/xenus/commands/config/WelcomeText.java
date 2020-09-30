@@ -8,44 +8,40 @@ import xyz.xenus.lib.command.CommandContext;
 import xyz.xenus.lib.mongodb.guild.GuildModel;
 
 public class WelcomeText extends Command {
-  public WelcomeText() {
-    super("welcomeText");
-    setCategory(Categories.CONFIG);
-    setDescription("Let's you set a welcome message for new users.");
-    setUsage("<Message>");
-    setPerms(new Permission[]{Permission.ADMINISTRATOR});
-  }
-
-  @Override
-  public void run(@NotNull CommandContext ctx) {
-    GuildModel guildModel = (GuildModel) ctx.getClient().getDbManager().find(
-            ctx.getEvent().getGuild()
-    );
-
-    if (ctx.getArgs().isEmpty()) {
-      Utils.sendEm(
-              ctx.getEvent().getChannel(),
-              ctx.getClient().getCross() + " The message can't be empty!",
-              Utils.Embeds.ERROR
-      ).queue();
-      return;
+    public WelcomeText() {
+        super("welcomeText");
+        setCategory(Categories.CONFIG);
+        setDescription("Let's you set a welcome message for new users.");
+        setUsage("<Message>");
+        setPerms(new Permission[]{Permission.ADMINISTRATOR});
     }
 
-    String message = String.join(" ", ctx.getArgs());
-    guildModel.getWelcome().setMessage(message);
-    guildModel = (GuildModel) ctx.getClient().getDbManager().save(guildModel);
+    @Override
+    public void run(@NotNull CommandContext ctx) {
+        if (ctx.getArgs().isEmpty()) {
+            Utils.sendEm(
+                    ctx.getEvent().getChannel(),
+                    ctx.getClient().getCross() + " The message can't be empty!",
+                    Utils.Embeds.ERROR
+            ).queue();
+            return;
+        }
 
-    Utils.sendEm(
-            ctx.getEvent().getChannel(),
-            ctx.getClient().getTick() + " Welcome message set to:\n\n" +
-                    guildModel.getWelcome().getMessage(),
-            Utils.Embeds.SUCCESS
-    ).queue();
-    Utils.sendConfigLog(
-            ctx.getEvent(),
-            guildModel,
-            "Changed Welcome Message",
-            "Welcome message changed to\n\n" + guildModel.getWelcome().getMessage()
-    );
-  }
+        String message = String.join(" ", ctx.getArgs());
+        ctx.getGuildModel().getWelcome().setMessage(message);
+        ctx.setGuildModel((GuildModel) ctx.getClient().getDbManager().save(ctx.getGuildModel()));
+
+        Utils.sendEm(
+                ctx.getEvent().getChannel(),
+                ctx.getClient().getTick() + " Welcome message set to:\n\n" +
+                        ctx.getGuildModel().getWelcome().getMessage(),
+                Utils.Embeds.SUCCESS
+        ).queue();
+        Utils.sendConfigLog(
+                ctx.getEvent(),
+                ctx.getGuildModel(),
+                "Changed Welcome Message",
+                "Welcome message changed to\n\n" + ctx.getGuildModel().getWelcome().getMessage()
+        );
+    }
 }

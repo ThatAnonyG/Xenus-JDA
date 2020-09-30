@@ -11,63 +11,58 @@ import java.util.Optional;
 // TODO - Fix the getMember function
 
 public class Pay extends Command {
-  public Pay() {
-    super("pay");
-    setCategory(Categories.ECONOMY);
-    setCd(120000);
-    setDescription("Pay someone coins from your account.");
-    setUsage("<Mention User | ID> <Amount>");
-  }
-
-  @Override
-  public void run(CommandContext ctx) {
-    Optional<Member> optionalMember = Utils.getMember(ctx.getEvent().getMessage(), ctx.getArgs());
-    if (optionalMember.isEmpty()) {
-      Utils.sendEm(
-              ctx.getEvent().getChannel(),
-              ctx.getClient().getCross() + " No user found with the given info!",
-              Utils.Embeds.ERROR
-      ).queue();
-      return;
+    public Pay() {
+        super("pay");
+        setCategory(Categories.ECONOMY);
+        setCd(120000);
+        setDescription("Pay someone coins from your account.");
+        setUsage("<Mention User | ID> <Amount>");
     }
 
-    Member member = optionalMember.get();
-    UserModel userModel = (UserModel) ctx.getClient().getDbManager().find(
-            ctx.getEvent().getAuthor()
-    );
-    UserModel memberModel = (UserModel) ctx.getClient().getDbManager().find(
-            member.getUser()
-    );
+    @Override
+    public void run(CommandContext ctx) {
+        Optional<Member> optionalMember = Utils.getMember(ctx.getEvent().getMessage(), ctx.getArgs());
+        if (optionalMember.isEmpty()) {
+            Utils.sendEm(
+                    ctx.getEvent().getChannel(),
+                    ctx.getClient().getCross() + " No user found with the given info!",
+                    Utils.Embeds.ERROR
+            ).queue();
+            return;
+        }
 
-    if (ctx.getArgs().size() < 2 || !Utils.isInteger(ctx.getArgs().get(1))) {
-      Utils.sendEm(
-              ctx.getEvent().getChannel(),
-              ctx.getClient().getCross() + " Please enter an amount your want to pay!",
-              Utils.Embeds.ERROR
-      ).queue();
-      return;
+        Member member = optionalMember.get();
+        UserModel memberModel = (UserModel) ctx.getClient().getDbManager().find(member.getUser());
+
+        if (ctx.getArgs().size() < 2 || !Utils.isInteger(ctx.getArgs().get(1))) {
+            Utils.sendEm(
+                    ctx.getEvent().getChannel(),
+                    ctx.getClient().getCross() + " Please enter an amount your want to pay!",
+                    Utils.Embeds.ERROR
+            ).queue();
+            return;
+        }
+
+        long amount = Integer.parseInt(ctx.getArgs().get(1));
+        if (amount > ctx.getUserModel().getEconomy().getCoins()) {
+            Utils.sendEm(
+                    ctx.getEvent().getChannel(),
+                    ctx.getClient().getCross() + " Amount cannot be more than your balance!",
+                    Utils.Embeds.ERROR
+            ).queue();
+            return;
+        }
+
+        ctx.getUserModel().getEconomy().setCoins(ctx.getUserModel().getEconomy().getCoins() - amount);
+        memberModel.getEconomy().setCoins(memberModel.getEconomy().getCoins() + amount);
+        ctx.getClient().getDbManager().save(ctx.getUserModel());
+        ctx.getClient().getDbManager().save(memberModel);
+
+        Utils.sendEm(
+                ctx.getEvent().getChannel(),
+                ctx.getClient().getTick() + " Paid $" + amount + " to " +
+                        member.getAsMention() + "!",
+                Utils.Embeds.SUCCESS
+        ).queue();
     }
-
-    long amount = Integer.parseInt(ctx.getArgs().get(1));
-    if (amount > userModel.getEconomy().getCoins()) {
-      Utils.sendEm(
-              ctx.getEvent().getChannel(),
-              ctx.getClient().getCross() + " Amount cannot be more than your balance!",
-              Utils.Embeds.ERROR
-      ).queue();
-      return;
-    }
-
-    userModel.getEconomy().setCoins(userModel.getEconomy().getCoins() - amount);
-    memberModel.getEconomy().setCoins(memberModel.getEconomy().getCoins() + amount);
-    ctx.getClient().getDbManager().save(userModel);
-    ctx.getClient().getDbManager().save(memberModel);
-
-    Utils.sendEm(
-            ctx.getEvent().getChannel(),
-            ctx.getClient().getTick() + " Paid $" + amount + " to " +
-                    member.getAsMention() + "!",
-            Utils.Embeds.SUCCESS
-    ).queue();
-  }
 }

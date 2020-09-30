@@ -6,70 +6,56 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.Utils;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
-import xyz.xenus.lib.mongodb.guild.GuildModel;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
 public class LogChannel extends Command {
-  public LogChannel() {
-    super("logChannel");
-    setCategory(Categories.CONFIG);
-    setDescription("Let's you set a channel for mod logs.");
-    setUsage("[Channel Mention | ID] - Leave it blank to disable mod logs");
-    setPerms(new Permission[]{Permission.ADMINISTRATOR});
-  }
-
-  @Override
-  public void run(@NotNull CommandContext ctx) {
-    GuildModel guildModel = (GuildModel) ctx.getClient().getDbManager().find(
-            ctx.getEvent().getGuild()
-    );
-
-    if (ctx.getArgs().isEmpty()) {
-      guildModel.getIds().setLogs("");
-      ctx.getClient().getDbManager().save(guildModel);
-      Utils.sendEm(
-              ctx.getEvent().getChannel(),
-              ctx.getClient().getTick() + " Mod logs have been disabled!",
-              Utils.Embeds.SUCCESS
-      ).queue();
-      return;
+    public LogChannel() {
+        super("logChannel");
+        setCategory(Categories.CONFIG);
+        setDescription("Let's you set a channel for mod logs.");
+        setUsage("[Channel Mention | ID] - Leave it blank to disable mod logs");
+        setPerms(new Permission[]{Permission.ADMINISTRATOR});
     }
 
-    AtomicReference<TextChannel> channel = new AtomicReference<>();
-    if (
-            !ctx.getEvent().getMessage().getMentionedChannels().isEmpty() &&
-                    ctx.getEvent().getGuild().getTextChannels().contains(
-                            ctx.getEvent().getMessage().getMentionedChannels().get(0)
-                    )
-    )
-      channel.set(ctx.getEvent().getMessage().getMentionedChannels().get(0));
-    if (Utils.isSnowflake(ctx.getArgs().get(0)))
-      channel.set(ctx.getEvent().getGuild().getTextChannelById(ctx.getArgs().get(0)));
-    if (channel.get() == null) {
-      Utils.sendEm(
-              ctx.getEvent().getChannel(),
-              ctx.getClient().getCross() + " No channel found with the given info!",
-              Utils.Embeds.ERROR
-      ).queue();
-      return;
+    @Override
+    public void run(@NotNull CommandContext ctx) {
+        if (ctx.getArgs().isEmpty()) {
+            ctx.getGuildModel().getIds().setLogs("");
+            ctx.getClient().getDbManager().save(ctx.getGuildModel());
+            Utils.sendEm(
+                    ctx.getEvent().getChannel(),
+                    ctx.getClient().getTick() + " Mod logs have been disabled!",
+                    Utils.Embeds.SUCCESS
+            ).queue();
+            return;
+        }
+
+        Optional<TextChannel> channel = Utils.getChannel(ctx.getEvent().getMessage(), ctx.getArgs());
+        if (channel.isEmpty()) {
+            Utils.sendEm(
+                    ctx.getEvent().getChannel(),
+                    ctx.getClient().getCross() + " No channel found with the given info!",
+                    Utils.Embeds.ERROR
+            ).queue();
+            return;
+        }
+
+        ctx.getGuildModel().getIds().setLogs(channel.get().getId());
+        ctx.getClient().getDbManager().save(ctx.getGuildModel());
+
+        Utils.sendEm(
+                ctx.getEvent().getChannel(),
+                ctx.getClient().getTick() + " Mod log channel changed to " +
+                        channel.get().getAsMention() + "!",
+                Utils.Embeds.SUCCESS
+        ).queue();
+        Utils.sendConfigLog(
+                ctx.getEvent(),
+                ctx.getGuildModel(),
+                "Changed Mod Log Channel",
+                "Mod log channel changed to " + channel.get().getAsMention() +
+                        " | " + channel.get().getId()
+        );
     }
-
-    guildModel.getIds().setLogs(channel.get().getId());
-    ctx.getClient().getDbManager().save(guildModel);
-
-    Utils.sendEm(
-            ctx.getEvent().getChannel(),
-            ctx.getClient().getTick() + " Mod log channel changed to " +
-                    channel.get().getAsMention() + "!",
-            Utils.Embeds.SUCCESS
-    ).queue();
-    Utils.sendConfigLog(
-            ctx.getEvent(),
-            guildModel,
-            "Changed Mod Log Channel",
-            "Mod log channel changed to " + channel.get().getAsMention() +
-                    " | " + channel.get().getId()
-    );
-  }
 }

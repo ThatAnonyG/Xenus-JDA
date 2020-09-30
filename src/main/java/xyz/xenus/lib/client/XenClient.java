@@ -21,6 +21,9 @@ import xyz.xenus.commands.info.Help;
 import xyz.xenus.commands.info.Info;
 import xyz.xenus.commands.info.Ping;
 import xyz.xenus.commands.utils.Avatar;
+import xyz.xenus.commands.utils.Say;
+import xyz.xenus.commands.utils.Tag;
+import xyz.xenus.commands.utils.UserInfo;
 import xyz.xenus.events.BaseEvent;
 import xyz.xenus.events.EMessage;
 import xyz.xenus.events.EReady;
@@ -35,195 +38,201 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class XenClient {
-  private final String token;
-  private final HashMap<String, BaseEvent> events = new HashMap<>();
-  private final HashMap<String, Command> commands = new HashMap<>();
-  private final ConfigDao config = new Config().load().getConfig();
-  private final DBManager dbManager = new DBManager(config.getMongoDao().getUri());
-  private final Logger LOG = LoggerFactory.getLogger(XenClient.class);
-  private JDA api;
-  private Economy ecoModule;
-  private long startTime;
-  private String tick;
-  private String cross;
-  private String premium;
-  private String dev;
+    private final String token;
+    private final HashMap<String, BaseEvent> events = new HashMap<>();
+    private final HashMap<String, Command> commands = new HashMap<>();
+    private final ConfigDao config = new Config().load().getConfig();
+    private final DBManager dbManager = new DBManager(config.getMongoDao().getUri());
+    private final Logger LOG = LoggerFactory.getLogger(XenClient.class);
+    private JDA api;
+    private Economy ecoModule;
+    private long startTime;
+    private String tick;
+    private String cross;
+    private String premium;
+    private String dev;
 
-  public XenClient() {
-    this.token = config.getBotDao().getToken();
-    registerEvents(new BaseEvent[]{
-            new EReady(this),
-            new EMessage(this)
-    });
-    registerCommands(new Command[]{
-            // Config
-            new ChannelXP(),
-            new CoinAlert(),
-            new DefaultRole(),
-            new LeaveChannel(),
-            new LevelUpAlert(),
-            new LogChannel(),
-            new MessageDelete(),
-            new ModRole(),
-            new Prefix(),
-            new ReportChannel(),
-            new Tag(),
-            new Toggle(),
-            new TopRole(),
-            new Verify(),
-            new WelcomeChannel(),
-            new WelcomeText(),
-            new XPRate(),
+    public XenClient() {
+        this.token = config.getBotDao().getToken();
+        registerEvents(new BaseEvent[]{
+                new EReady(this),
+                new EMessage(this)
+        });
+        registerCommands(new Command[]{
+                // Config
+                new ChannelXP(),
+                new CoinAlert(),
+                new DefaultRole(),
+                new LeaveChannel(),
+                new LevelUpAlert(),
+                new LogChannel(),
+                new MessageDelete(),
+                new ModRole(),
+                new Prefix(),
+                new ReportChannel(),
+                new TagConfig(),
+                new Toggle(),
+                new TopRole(),
+                new Verify(),
+                new WelcomeChannel(),
+                new WelcomeText(),
+                new XPRate(),
 
-            // Dev
-            new Blacklist(),
-            new Developer(),
-            new Premium(),
+                // Dev
+                new Blacklist(),
+                new Developer(),
+                new Premium(),
 
-            // Economy
-            new Daily(),
-            new Gamble(),
-            new Leaderboard(),
-            new Pay(),
-            new Profile(),
+                // Economy
+                new Daily(),
+                new Gamble(),
+                new Jobs(),
+                new Leaderboard(),
+                new Pay(),
+                new Profile(),
+                new Rep(),
+                new Work(),
 
-            // Fun
-            new Flip(),
-            new Meme(),
+                // Fun
+                new Flip(),
+                new Meme(),
 
-            // Info
-            new Configs(),
-            new Help(),
-            new Info(),
-            new Ping(),
+                // Info
+                new Configs(),
+                new Help(),
+                new Info(),
+                new Ping(),
 
-            // Moderation
+                // Moderation
 
-            // Utils
-            new Avatar()
-    });
-  }
-
-  public String getToken() {
-    return token;
-  }
-
-  public HashMap<String, BaseEvent> getEvents() {
-    return events;
-  }
-
-  public HashMap<String, Command> getCommands() {
-    return commands;
-  }
-
-  public ConfigDao getConfig() {
-    return config;
-  }
-
-  public DBManager getDbManager() {
-    return dbManager;
-  }
-
-  @Nullable
-  public JDA getApi() {
-    return api;
-  }
-
-  public Economy getEcoModule() {
-    return ecoModule;
-  }
-
-  public long getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(long startTime) {
-    this.startTime = startTime;
-  }
-
-  public String getTick() {
-    return tick;
-  }
-
-  public void setTick(String tick) {
-    this.tick = tick;
-  }
-
-  public String getCross() {
-    return cross;
-  }
-
-  public void setCross(String cross) {
-    this.cross = cross;
-  }
-
-  public String getPremium() {
-    return premium;
-  }
-
-  public void setPremium(String premium) {
-    this.premium = premium;
-  }
-
-  public String getDev() {
-    return dev;
-  }
-
-  public void setDev(String dev) {
-    this.dev = dev;
-  }
-
-  public void build() throws LoginException {
-    dbManager.login(config.getMongoDao().getDb());
-    api = JDABuilder
-            .createDefault(
-                    token,
-                    GatewayIntent.GUILD_MESSAGES,
-                    GatewayIntent.GUILD_MEMBERS,
-                    GatewayIntent.GUILD_EMOJIS
-            )
-            .disableCache(
-                    CacheFlag.ACTIVITY,
-                    CacheFlag.CLIENT_STATUS,
-                    CacheFlag.VOICE_STATE
-            )
-            .setAutoReconnect(true)
-            .addEventListeners(new EventHandler(this))
-            .setActivity(Activity.watching("https://xenus.xyz/"))
-            .build();
-    ecoModule = new Economy(this);
-  }
-
-  private void registerEvents(@NotNull BaseEvent[] evtArr) {
-    for (BaseEvent event : evtArr) {
-      if (commands.containsKey(event.getName())) {
-        LOG.info(event.getName() + ": Event already registered!");
-      }
-      events.put(event.getName(), event);
-      LOG.info(event.getName() + ": Event registered!");
+                // Utils
+                new Avatar(),
+                new Say(),
+                new Tag(),
+                new UserInfo()
+        });
     }
-  }
 
-  private void registerCommands(@NotNull Command[] cmdArr) {
-    for (Command command : cmdArr) {
-      if (commands.containsKey(command.getName())) {
-        LOG.info(command.getName() + ": Command already registered!");
-      }
-      commands.put(command.getName().toLowerCase(), command);
-      LOG.info(command.getName() + ": Command registered!");
+    public String getToken() {
+        return token;
     }
-  }
 
-  @Nullable
-  public Command getCommand(String name) {
-    Object[] found = commands
-            .values()
-            .stream()
-            .filter((c) -> c.getName().toLowerCase().equals(name.toLowerCase())
-                    || Arrays.stream(c.getAliases()).anyMatch((a) -> a.toLowerCase().equals(name.toLowerCase()))
-            ).toArray();
+    public HashMap<String, BaseEvent> getEvents() {
+        return events;
+    }
 
-    if (found.length == 0) return null;
-    return (Command) found[0];
-  }
+    public HashMap<String, Command> getCommands() {
+        return commands;
+    }
+
+    public ConfigDao getConfig() {
+        return config;
+    }
+
+    public DBManager getDbManager() {
+        return dbManager;
+    }
+
+    @Nullable
+    public JDA getApi() {
+        return api;
+    }
+
+    public Economy getEcoModule() {
+        return ecoModule;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getTick() {
+        return tick;
+    }
+
+    public void setTick(String tick) {
+        this.tick = tick;
+    }
+
+    public String getCross() {
+        return cross;
+    }
+
+    public void setCross(String cross) {
+        this.cross = cross;
+    }
+
+    public String getPremium() {
+        return premium;
+    }
+
+    public void setPremium(String premium) {
+        this.premium = premium;
+    }
+
+    public String getDev() {
+        return dev;
+    }
+
+    public void setDev(String dev) {
+        this.dev = dev;
+    }
+
+    public void build() throws LoginException {
+        dbManager.login(config.getMongoDao().getDb());
+        api = JDABuilder
+                .createDefault(
+                        token,
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_EMOJIS
+                )
+                .disableCache(
+                        CacheFlag.ACTIVITY,
+                        CacheFlag.CLIENT_STATUS,
+                        CacheFlag.VOICE_STATE
+                )
+                .setAutoReconnect(true)
+                .addEventListeners(new EventHandler(this))
+                .setActivity(Activity.watching("https://xenus.xyz/"))
+                .build();
+        ecoModule = new Economy(this);
+    }
+
+    private void registerEvents(@NotNull BaseEvent[] evtArr) {
+        for (BaseEvent event : evtArr) {
+            if (commands.containsKey(event.getName())) {
+                LOG.info(event.getName() + ": Event already registered!");
+            }
+            events.put(event.getName(), event);
+            LOG.info(event.getName() + ": Event registered!");
+        }
+    }
+
+    private void registerCommands(@NotNull Command[] cmdArr) {
+        for (Command command : cmdArr) {
+            if (commands.containsKey(command.getName())) {
+                LOG.info(command.getName() + ": Command already registered!");
+            }
+            commands.put(command.getName().toLowerCase(), command);
+            LOG.info(command.getName() + ": Command registered!");
+        }
+    }
+
+    @Nullable
+    public Command getCommand(String name) {
+        Object[] found = commands
+                .values()
+                .stream()
+                .filter((c) -> c.getName().toLowerCase().equals(name.toLowerCase())
+                        || Arrays.stream(c.getAliases()).anyMatch((a) -> a.toLowerCase().equals(name.toLowerCase()))
+                ).toArray();
+
+        if (found.length == 0) return null;
+        return (Command) found[0];
+    }
 }

@@ -13,149 +13,147 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class Configs extends Command {
-  public Configs() {
-    super("configs");
-    setCd(5000);
-    setDescription("Shows you the current bot configuration for this server.");
-  }
+    public Configs() {
+        super("configs");
+        setCd(5000);
+        setDescription("Shows you the current bot configuration for this server.");
+    }
 
-  @Override
-  public void run(CommandContext ctx) {
-    GuildModel guildModel = (GuildModel) ctx.getClient().getDbManager().find(
-            ctx.getEvent().getGuild()
-    );
+    @Override
+    public void run(CommandContext ctx) {
+        GuildModel guildModel = ctx.getGuildModel();
 
-    // Moderation Settings
-    TextChannel logChannel = Utils.isSnowflake(guildModel.getIds().getLogs()) ?
-            ctx.getEvent().getGuild().getTextChannelById(
-                    guildModel.getIds().getLogs()
-            ) :
-            null;
-    TextChannel rChannel = Utils.isSnowflake(guildModel.getIds().getReports()) ?
-            ctx.getEvent().getGuild().getTextChannelById(
-                    guildModel.getIds().getReports()
-            ) :
-            null;
-    String[] modRoles = guildModel.getIds().getAdminRoles().stream().map((r) -> {
-      Role role = Utils.isSnowflake(r) ? ctx.getEvent().getGuild().getRoleById(r) : null;
-      if (role != null) return role.getAsMention();
-      return null;
-    }).toArray(String[]::new);
+        // Moderation Settings
+        TextChannel logChannel = Utils.isSnowflake(guildModel.getIds().getLogs()) ?
+                ctx.getEvent().getGuild().getTextChannelById(
+                        guildModel.getIds().getLogs()
+                ) :
+                null;
+        TextChannel rChannel = Utils.isSnowflake(guildModel.getIds().getReports()) ?
+                ctx.getEvent().getGuild().getTextChannelById(
+                        guildModel.getIds().getReports()
+                ) :
+                null;
+        String[] modRoles = guildModel.getIds().getAdminRoles().stream().map((r) -> {
+            Role role = Utils.isSnowflake(r) ? ctx.getEvent().getGuild().getRoleById(r) : null;
+            if (role != null) return role.getAsMention();
+            return null;
+        }).toArray(String[]::new);
 
-    // Mod logs
-    String[] logs = new String[]{"warn", "mute", "unmute", "kick", "ban"};
-    String[] logsList = Arrays.stream(logs).map((l) -> {
-      Optional<Logs> log = guildModel.getLogs().stream().filter(
-              (x) -> x.getType().equals(l)
-      ).findFirst();
-      return log.map(
-              (x) -> "`" + (l.substring(0, 1).toUpperCase() + l.substring(1)) + "`: " +
-                      (x.isEnabled() ? "Enabled" : "Disabled")).orElse(
-              "`" + (l.substring(0, 1).toUpperCase() + l.substring(1)) + "`: Disabled"
-      );
-    }).toArray(String[]::new);
+        // Mod logs
+        String[] logs = new String[]{"warn", "mute", "unmute", "kick", "ban"};
+        String[] logsList = Arrays.stream(logs).map((l) -> {
+            Optional<Logs> log = guildModel.getLogs().stream().filter(
+                    (x) -> x.getType().equals(l)
+            ).findFirst();
+            return log.map(
+                    (x) -> "`" + (l.substring(0, 1).toUpperCase() + l.substring(1)) + "`: " +
+                            (x.isEnabled() ? "Enabled" : "Disabled")).orElse(
+                    "`" + (l.substring(0, 1).toUpperCase() + l.substring(1)) + "`: Disabled"
+            );
+        }).toArray(String[]::new);
 
-    // Categories
-    String[] catsList = Arrays.stream(Categories.values()).map((l) -> {
-      if (Arrays.asList("config", "dev", "info").contains(l.toString().toLowerCase())) return null;
+        // Categories
+        String[] catsList = Arrays.stream(Categories.values()).map((l) -> {
+            if (Arrays.asList("config", "dev", "info").contains(l.toString().toLowerCase())) return null;
 
-      String name = l.toString().charAt(0) + l.toString().substring(1).toLowerCase();
-      if (guildModel.getEnabled().contains(name.toLowerCase())) return "`" + name + "`: Enabled";
-      return "`" + name + "`: Disabled";
-    }).toArray(String[]::new);
+            String name = l.toString().charAt(0) + l.toString().substring(1).toLowerCase();
+            if (guildModel.getEnabled().contains(name.toLowerCase())) return "`" + name + "`: Enabled";
+            return "`" + name + "`: Disabled";
+        }).toArray(String[]::new);
 
-    // Welcome System
-    TextChannel joinChannel = Utils.isSnowflake(guildModel.getWelcome().getJoins()) ?
-            ctx.getEvent().getGuild().getTextChannelById(guildModel.getWelcome().getJoins()) :
-            null;
-    TextChannel leaveChannel = Utils.isSnowflake(guildModel.getWelcome().getLeaves()) ?
-            ctx.getEvent().getGuild().getTextChannelById(guildModel.getWelcome().getLeaves()) :
-            null;
-    Role defRole = Utils.isSnowflake(guildModel.getWelcome().getRole()) ?
-            ctx.getEvent().getGuild().getRoleById(guildModel.getWelcome().getRole()) :
-            null;
-    Role verifyRole = Utils.isSnowflake(guildModel.getWelcome().getVerifyRole()) ?
-            ctx.getEvent().getGuild().getRoleById(guildModel.getWelcome().getVerifyRole()) :
-            null;
-    byte verifyChances = guildModel.getWelcome().getVerifyChances();
-    long verifyTimeout = guildModel.getWelcome().getVerifyTimeout();
+        // Welcome System
+        TextChannel joinChannel = Utils.isSnowflake(guildModel.getWelcome().getJoins()) ?
+                ctx.getEvent().getGuild().getTextChannelById(guildModel.getWelcome().getJoins()) :
+                null;
+        TextChannel leaveChannel = Utils.isSnowflake(guildModel.getWelcome().getLeaves()) ?
+                ctx.getEvent().getGuild().getTextChannelById(guildModel.getWelcome().getLeaves()) :
+                null;
+        Role defRole = Utils.isSnowflake(guildModel.getWelcome().getRole()) ?
+                ctx.getEvent().getGuild().getRoleById(guildModel.getWelcome().getRole()) :
+                null;
+        Role verifyRole = Utils.isSnowflake(guildModel.getWelcome().getVerifyRole()) ?
+                ctx.getEvent().getGuild().getRoleById(guildModel.getWelcome().getVerifyRole()) :
+                null;
+        byte verifyChances = guildModel.getWelcome().getVerifyChances();
+        long verifyTimeout = guildModel.getWelcome().getVerifyTimeout();
 
-    // Economy
-    Role xpLead = Utils.isSnowflake(guildModel.getEconomy().getXpLead()) ?
-            ctx.getEvent().getGuild().getRoleById(guildModel.getEconomy().getXpLead()) :
-            null;
-    String[] blockedChannels = guildModel.getEconomy().getBlocked().stream().map((r) -> {
-      TextChannel channel = Utils.isSnowflake(r) ?
-              ctx.getEvent().getGuild().getTextChannelById(r) :
-              null;
-      if (channel != null) return channel.getAsMention();
-      return null;
-    }).toArray(String[]::new);
+        // Economy
+        Role xpLead = Utils.isSnowflake(guildModel.getEconomy().getXpLead()) ?
+                ctx.getEvent().getGuild().getRoleById(guildModel.getEconomy().getXpLead()) :
+                null;
+        String[] blockedChannels = guildModel.getEconomy().getBlocked().stream().map((r) -> {
+            TextChannel channel = Utils.isSnowflake(r) ?
+                    ctx.getEvent().getGuild().getTextChannelById(r) :
+                    null;
+            if (channel != null) return channel.getAsMention();
+            return null;
+        }).toArray(String[]::new);
 
-    MessageEmbed embed = Utils.embed()
-            .setTitle("Server Configs")
-            .setColor(Utils.getHex())
-            .setThumbnail(ctx.getEvent().getGuild().getIconUrl())
-            .addField(
-                    "Moderation Settings",
-                    String.join(
-                            "\n",
-                            "**Mod Logs:** " +
-                                    (logChannel == null ? "Not Set" : logChannel.getAsMention()),
-                            "**Report Logs:** " +
-                                    (rChannel == null ? "Not Set" : rChannel.getAsMention()),
-                            "**Mod Roles:** " +
-                                    (modRoles.length == 0 ?
-                                            "Not Set" :
-                                            String.join(" | ", modRoles)),
-                            "**Delete mod message after command:** " +
-                                    (guildModel.isMsgDelete() ? "Enabled" : "Disabled")
-                    ),
-                    false
-            )
-            .addField("Mod Logs", String.join("\n", logsList), false)
-            .addField("Categories", String.join("\n", catsList), false)
-            .addField(
-                    "Welcome System",
-                    String.join(
-                            "\n",
-                            "**Join Logs:** " +
-                                    (joinChannel == null ? "Not Set" : joinChannel.getAsMention()),
-                            "**Leave Logs:** " +
-                                    (leaveChannel == null ? "Not Set" : leaveChannel.getAsMention()),
-                            "**Default Role:** " +
-                                    (defRole == null ? "Not Set" : defRole.getAsMention()),
-                            "**Welcome Message:**\n" + guildModel.getWelcome().getMessage(),
-                            "**Verified Role:** " +
-                                    (verifyRole == null ? "Not Set" : verifyRole.getAsMention()),
-                            "**Captcha Chances:** " +
-                                    (verifyChances == 0 ? "Not Set" : verifyChances),
-                            "**Verify Timeout:**" +
-                                    (verifyTimeout == 0 ? "Not Set" : verifyTimeout)
-                    ),
-                    false
-            )
-            .addField(
-                    "Economy",
-                    String.join(
-                            "\n",
-                            "**XP Gain Rate:** " + guildModel.getEconomy().getXpRate(),
-                            "**XP Lead Role:** " +
-                                    (xpLead == null ? "Not Set" : xpLead.getAsMention()),
-                            "**Blocked Channels:** " +
-                                    (blockedChannels.length == 0 ?
-                                            "Not Set" :
-                                            String.join(" | ", blockedChannels)),
-                            "**Level Up Alerts:** " +
-                                    (guildModel.getEconomy().isLvlUpAlert() ? "Enabled" : "Disabled"),
-                            "**Coin Gain Alerts:** " +
-                                    (guildModel.getEconomy().isCoinAlert() ? "Enabled" : "Disabled")
-                    ),
-                    false
-            )
-            .setFooter("Prefix: " + guildModel.getPrefix(), "https://imgur.com/orfFkI6.png")
-            .build();
+        MessageEmbed embed = Utils.embed()
+                .setTitle("Server Configs")
+                .setColor(Utils.getHex())
+                .setThumbnail(ctx.getEvent().getGuild().getIconUrl())
+                .addField(
+                        "Moderation Settings",
+                        String.join(
+                                "\n",
+                                "**Mod Logs:** " +
+                                        (logChannel == null ? "Not Set" : logChannel.getAsMention()),
+                                "**Report Logs:** " +
+                                        (rChannel == null ? "Not Set" : rChannel.getAsMention()),
+                                "**Mod Roles:** " +
+                                        (modRoles.length == 0 ?
+                                                "Not Set" :
+                                                String.join(" | ", modRoles)),
+                                "**Delete mod message after command:** " +
+                                        (guildModel.isMsgDelete() ? "Enabled" : "Disabled")
+                        ),
+                        false
+                )
+                .addField("Mod Logs", String.join("\n", logsList), false)
+                .addField("Categories", String.join("\n", catsList), false)
+                .addField(
+                        "Welcome System",
+                        String.join(
+                                "\n",
+                                "**Join Logs:** " +
+                                        (joinChannel == null ? "Not Set" : joinChannel.getAsMention()),
+                                "**Leave Logs:** " +
+                                        (leaveChannel == null ? "Not Set" : leaveChannel.getAsMention()),
+                                "**Default Role:** " +
+                                        (defRole == null ? "Not Set" : defRole.getAsMention()),
+                                "**Welcome Message:**\n" + guildModel.getWelcome().getMessage(),
+                                "**Verified Role:** " +
+                                        (verifyRole == null ? "Not Set" : verifyRole.getAsMention()),
+                                "**Captcha Chances:** " +
+                                        (verifyChances == 0 ? "Not Set" : verifyChances),
+                                "**Verify Timeout:**" +
+                                        (verifyTimeout == 0 ? "Not Set" : verifyTimeout)
+                        ),
+                        false
+                )
+                .addField(
+                        "Economy",
+                        String.join(
+                                "\n",
+                                "**XP Gain Rate:** " + guildModel.getEconomy().getXpRate(),
+                                "**XP Lead Role:** " +
+                                        (xpLead == null ? "Not Set" : xpLead.getAsMention()),
+                                "**Blocked Channels:** " +
+                                        (blockedChannels.length == 0 ?
+                                                "Not Set" :
+                                                String.join(" | ", blockedChannels)),
+                                "**Level Up Alerts:** " +
+                                        (guildModel.getEconomy().isLvlUpAlert() ? "Enabled" : "Disabled"),
+                                "**Coin Gain Alerts:** " +
+                                        (guildModel.getEconomy().isCoinAlert() ? "Enabled" : "Disabled")
+                        ),
+                        false
+                )
+                .setFooter("Prefix: " + guildModel.getPrefix(), "https://imgur.com/orfFkI6.png")
+                .build();
 
-    ctx.getEvent().getChannel().sendMessage(embed).queue();
-  }
+        ctx.getEvent().getChannel().sendMessage(embed).queue();
+    }
 }
