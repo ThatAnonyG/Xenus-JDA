@@ -20,6 +20,8 @@ import xyz.xenus.commands.info.Configs;
 import xyz.xenus.commands.info.Help;
 import xyz.xenus.commands.info.Info;
 import xyz.xenus.commands.info.Ping;
+import xyz.xenus.commands.moderation.Ban;
+import xyz.xenus.commands.moderation.Kick;
 import xyz.xenus.commands.utils.Avatar;
 import xyz.xenus.commands.utils.Say;
 import xyz.xenus.commands.utils.Tag;
@@ -104,6 +106,8 @@ public class XenClient {
                 new Ping(),
 
                 // Moderation
+                new Ban(),
+                new Kick(),
 
                 // Utils
                 new Avatar(),
