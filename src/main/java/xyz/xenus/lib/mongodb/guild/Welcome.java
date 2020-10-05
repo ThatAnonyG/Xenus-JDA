@@ -4,7 +4,7 @@ public class Welcome {
     private String joins = "";
     private String leaves = "";
     private String role = "";
-    private String message = "";
+    private String message = "Welcome to the server!";
     private String verifyRole = "";
     private byte verifyChances = 0;
     private long verifyTimeout = 0;

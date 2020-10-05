@@ -29,7 +29,7 @@ public class Gamble extends Command {
             ctx.getUserModel().getEconomy().setCoins(ctx.getUserModel().getEconomy().getCoins() + addCoins);
         }
 
-        ctx.getClient().getDbManager().save(ctx.getUserModel());
+        ctx.getUserModel().save();
         Utils.sendEm(
                 ctx.getEvent().getChannel(),
                 "You bet $" + bet + " and " +

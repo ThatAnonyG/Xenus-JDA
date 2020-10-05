@@ -22,7 +22,7 @@ public class LogChannel extends Command {
     public void run(@NotNull CommandContext ctx) {
         if (ctx.getArgs().isEmpty()) {
             ctx.getGuildModel().getIds().setLogs("");
-            ctx.getClient().getDbManager().save(ctx.getGuildModel());
+            ctx.getGuildModel().save();
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getTick() + " Mod logs have been disabled!",
@@ -42,7 +42,7 @@ public class LogChannel extends Command {
         }
 
         ctx.getGuildModel().getIds().setLogs(channel.get().getId());
-        ctx.getClient().getDbManager().save(ctx.getGuildModel());
+        ctx.getGuildModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

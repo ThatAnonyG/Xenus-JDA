@@ -20,8 +20,7 @@ import xyz.xenus.commands.info.Configs;
 import xyz.xenus.commands.info.Help;
 import xyz.xenus.commands.info.Info;
 import xyz.xenus.commands.info.Ping;
-import xyz.xenus.commands.moderation.Ban;
-import xyz.xenus.commands.moderation.Kick;
+import xyz.xenus.commands.moderation.*;
 import xyz.xenus.commands.utils.Avatar;
 import xyz.xenus.commands.utils.Say;
 import xyz.xenus.commands.utils.Tag;
@@ -75,7 +74,7 @@ public class XenClient {
                 new TagConfig(),
                 new Toggle(),
                 new TopRole(),
-                new Verify(),
+                //new Verify(),
                 new WelcomeChannel(),
                 new WelcomeText(),
                 new XPRate(),
@@ -92,6 +91,7 @@ public class XenClient {
                 new Leaderboard(),
                 new Pay(),
                 new Profile(),
+                //new Rank(),
                 new Rep(),
                 new Work(),
 
@@ -107,7 +107,15 @@ public class XenClient {
 
                 // Moderation
                 new Ban(),
+                new Cases(),
                 new Kick(),
+                new Mute(),
+                new Report(),
+                new Reports(),
+                new Role(),
+                new Unmute(),
+                new Warn(),
+                new Warns(),
 
                 // Utils
                 new Avatar(),

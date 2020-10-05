@@ -3,7 +3,7 @@ package xyz.xenus.lib.mongodb.member;
 public class Actions {
     private String mod = "";
     private String reason = "";
-    private int date = 0;
+    private long date = 0;
 
     public String getMod() {
         return mod;
@@ -21,11 +21,11 @@ public class Actions {
         this.reason = reason;
     }
 
-    public int getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(int date) {
+    public void setDate(long date) {
         this.date = date;
     }
 }

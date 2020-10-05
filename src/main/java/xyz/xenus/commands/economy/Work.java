@@ -36,7 +36,7 @@ public class Work extends Command {
         long salary = ctx.getUserModel().getEconomy().getJob().getSalary();
         ctx.getUserModel().getEconomy().getJob().setReady(System.currentTimeMillis() + 86400000);
         ctx.getUserModel().getEconomy().setCoins(ctx.getUserModel().getEconomy().getCoins() + salary);
-        ctx.getClient().getDbManager().save(ctx.getUserModel());
+        ctx.getUserModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
 
+// Todo - Complete the command
 public class Verify extends Command {
     public Verify() {
         super("verify");

@@ -45,7 +45,7 @@ public class Daily extends Command {
             ctx.getUserModel().getEconomy().getDaily().setCd(
                     (long) (System.currentTimeMillis() + 432e5)
             );
-            ctx.getClient().getDbManager().save(ctx.getUserModel());
+            ctx.getUserModel().save();
 
             Utils.sendEm(
                     ctx.getEvent().getChannel(),

@@ -53,7 +53,7 @@ public class ModRole extends Command {
                 }
 
                 ctx.getGuildModel().getIds().getAdminRoles().add(role.get().getId());
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
 
                 Utils.sendEm(
                         ctx.getEvent().getChannel(),
@@ -81,7 +81,7 @@ public class ModRole extends Command {
                 }
 
                 ctx.getGuildModel().getIds().getAdminRoles().remove(role.get().getId());
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
 
                 Utils.sendEm(
                         ctx.getEvent().getChannel(),

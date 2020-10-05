@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.Utils;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
-import xyz.xenus.lib.mongodb.guild.GuildModel;
 
 public class LevelUpAlert extends Command {
     public LevelUpAlert() {
@@ -19,7 +18,7 @@ public class LevelUpAlert extends Command {
     @Override
     public void run(@NotNull CommandContext ctx) {
         ctx.getGuildModel().getEconomy().setLvlUpAlert(!ctx.getGuildModel().getEconomy().isLvlUpAlert());
-        ctx.setGuildModel((GuildModel) ctx.getClient().getDbManager().save(ctx.getGuildModel()));
+        ctx.getGuildModel().save();
 
         String msg = (ctx.getGuildModel().getEconomy().isCoinAlert() ? "Enabled" : "Disabled") +
                 " level up alerts in this server!";

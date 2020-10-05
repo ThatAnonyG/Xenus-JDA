@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.Utils;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
-import xyz.xenus.lib.mongodb.guild.GuildModel;
 
 public class WelcomeText extends Command {
     public WelcomeText() {
@@ -29,7 +28,7 @@ public class WelcomeText extends Command {
 
         String message = String.join(" ", ctx.getArgs());
         ctx.getGuildModel().getWelcome().setMessage(message);
-        ctx.setGuildModel((GuildModel) ctx.getClient().getDbManager().save(ctx.getGuildModel()));
+        ctx.getGuildModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

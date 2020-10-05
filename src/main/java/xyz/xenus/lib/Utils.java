@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.mongodb.guild.GuildModel;
 
 import java.awt.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +65,22 @@ public class Utils {
         String formatted = String.join(".*", args.split(" "));
         return Pattern.compile(".*" + formatted + ".*", Pattern.CASE_INSENSITIVE)
                 .matcher(toFind).matches();
+    }
+
+    public static @NotNull MessageAction sendEm(
+            @NotNull PrivateChannel channel,
+            String content,
+            Embeds type
+    ) {
+        MessageEmbed embed = new EmbedBuilder()
+                .setColor(type == Embeds.SUCCESS ?
+                        getGreen() : type == Embeds.ERROR ?
+                        getRed() : type == Embeds.BASE ?
+                        getHex() : type == Embeds.PRO ?
+                        getProHex() : Color.white)
+                .setDescription(content)
+                .build();
+        return channel.sendMessage(embed);
     }
 
     public static @NotNull MessageAction sendEm(
@@ -177,6 +196,14 @@ public class Utils {
         return (hours < 10 ? "0" + String.valueOf(hours) : String.valueOf(hours)) + "h " +
                 (minutes < 10 ? "0" + String.valueOf(minutes) : String.valueOf(minutes)) + "m " +
                 (seconds < 10 ? "0" + String.valueOf(seconds) : String.valueOf(seconds)) + "s";
+    }
+
+    public static String formatDate(long ms) {
+        DateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm z");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(ms);
+        return formatter.format(calendar.getTime());
     }
 
     public enum Embeds {

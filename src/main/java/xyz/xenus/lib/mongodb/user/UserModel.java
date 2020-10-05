@@ -1,30 +1,18 @@
 package xyz.xenus.lib.mongodb.user;
 
-import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import xyz.xenus.lib.mongodb.Model;
 
-public class UserModel {
-    private ObjectId id;
+import static com.mongodb.client.model.Filters.eq;
 
-    private String uid;
+public class UserModel extends Model {
     private String bio = "Not set!";
     private Badges badges = new Badges();
     private Economy economy = new Economy();
     private Reps reps = new Reps();
 
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
+    public UserModel() {
+        super(ModelType.USER);
     }
 
     public String getBio() {
@@ -57,5 +45,14 @@ public class UserModel {
 
     public void setReps(Reps reps) {
         this.reps = reps;
+    }
+
+    @Override
+    public UserModel save() {
+        MongoCollection<UserModel> col = getManager().getDb().getCollection("users", UserModel.class);
+        UserModel model = col.findOneAndReplace(eq("model_id", getModelId()), this);
+        if (model == null) col.insertOne(this);
+        getManager().getUserDbCache().put(this.getModelId(), this);
+        return this;
     }
 }

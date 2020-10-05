@@ -22,7 +22,7 @@ public class TopRole extends Command {
     public void run(@NotNull CommandContext ctx) {
         if (ctx.getArgs().isEmpty()) {
             ctx.getGuildModel().getEconomy().setXpLead("");
-            ctx.getClient().getDbManager().save(ctx.getGuildModel());
+            ctx.getGuildModel().save();
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getTick() + " XP lead role has been disabled!",
@@ -50,7 +50,7 @@ public class TopRole extends Command {
         }
 
         ctx.getGuildModel().getEconomy().setXpLead(role.get().getId());
-        ctx.getClient().getDbManager().save(ctx.getGuildModel());
+        ctx.getGuildModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

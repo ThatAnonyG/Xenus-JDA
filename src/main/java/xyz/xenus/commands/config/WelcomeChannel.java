@@ -22,7 +22,7 @@ public class WelcomeChannel extends Command {
     public void run(@NotNull CommandContext ctx) {
         if (ctx.getArgs().isEmpty()) {
             ctx.getGuildModel().getWelcome().setJoins("");
-            ctx.getClient().getDbManager().save(ctx.getGuildModel());
+            ctx.getGuildModel().save();
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getTick() + " Join logs have been disabled!",
@@ -42,7 +42,7 @@ public class WelcomeChannel extends Command {
         }
 
         ctx.getGuildModel().getWelcome().setJoins(channel.get().getId());
-        ctx.getClient().getDbManager().save(ctx.getGuildModel());
+        ctx.getGuildModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

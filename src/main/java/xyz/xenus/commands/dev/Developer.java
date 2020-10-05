@@ -8,8 +8,6 @@ import xyz.xenus.lib.mongodb.user.UserModel;
 
 import java.util.Optional;
 
-// TODO - Fix the getMember function
-
 public class Developer extends Command {
     public Developer() {
         super("developer");
@@ -37,7 +35,7 @@ public class Developer extends Command {
         Member member = optionalMember.get();
         UserModel userModel = (UserModel) ctx.getClient().getDbManager().find(member.getUser());
         userModel.getBadges().setDeveloper(!userModel.getBadges().isDeveloper());
-        userModel = (UserModel) ctx.getClient().getDbManager().save(userModel);
+        ctx.getUserModel().save();
 
         String msg = userModel.getBadges().isDeveloper() ?
                 " has been added to bot developers!" :

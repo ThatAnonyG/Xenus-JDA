@@ -43,7 +43,7 @@ public class ChannelXP extends Command {
                 }
 
                 ctx.getGuildModel().getEconomy().getBlocked().remove(channel.getId());
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
 
                 Utils.sendEm(
                         channel,
@@ -71,7 +71,7 @@ public class ChannelXP extends Command {
                 }
 
                 ctx.getGuildModel().getEconomy().getBlocked().add(channel.getId());
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
 
                 Utils.sendEm(
                         channel,

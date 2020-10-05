@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.Utils;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
-import xyz.xenus.lib.mongodb.guild.GuildModel;
 
 public class MessageDelete extends Command {
     public MessageDelete() {
@@ -20,7 +19,7 @@ public class MessageDelete extends Command {
     @Override
     public void run(@NotNull CommandContext ctx) {
         ctx.getGuildModel().setMsgDelete(!ctx.getGuildModel().isMsgDelete());
-        ctx.setGuildModel((GuildModel) ctx.getClient().getDbManager().save(ctx.getGuildModel()));
+        ctx.getGuildModel().save();
 
         String msg = (ctx.getGuildModel().isMsgDelete() ? "**Enabled:**" : "**Disabled:**") +
                 " Delete mod messages after command is ran!";

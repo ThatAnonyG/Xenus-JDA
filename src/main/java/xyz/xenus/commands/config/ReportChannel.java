@@ -22,7 +22,7 @@ public class ReportChannel extends Command {
     public void run(@NotNull CommandContext ctx) {
         if (ctx.getArgs().isEmpty()) {
             ctx.getGuildModel().getIds().setReports("");
-            ctx.getClient().getDbManager().save(ctx.getGuildModel());
+            ctx.getGuildModel().save();
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getTick() + " Report logs have been disabled!",
@@ -42,7 +42,7 @@ public class ReportChannel extends Command {
         }
 
         ctx.getGuildModel().getIds().setReports(channel.get().getId());
-        ctx.getClient().getDbManager().save(ctx.getGuildModel());
+        ctx.getGuildModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

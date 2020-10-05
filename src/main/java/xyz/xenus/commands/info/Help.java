@@ -20,7 +20,7 @@ public class Help extends Command {
 
     @Override
     public void run(@NotNull CommandContext ctx) {
-        GuildModel guildModel = (GuildModel) ctx.getClient().getDbManager().find(
+        GuildModel guildModel = ctx.getClient().getDbManager().find(
                 ctx.getEvent().getGuild()
         );
 

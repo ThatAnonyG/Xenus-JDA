@@ -1,39 +1,27 @@
 package xyz.xenus.lib.mongodb.guild;
 
-import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import xyz.xenus.lib.command.Command;
+import xyz.xenus.lib.mongodb.Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
-public class GuildModel {
-    private ObjectId id;
+import static com.mongodb.client.model.Filters.eq;
 
-    private String gid;
+public class GuildModel extends Model {
     private String prefix = "=";
     private boolean msgDelete = false;
     private IDs ids = new IDs();
-    private ArrayList<String> enabled = new ArrayList<>(Arrays.asList(
-            "anime", "config", "dev", "economy", "fun", "info", "moderation", "music", "utility", "xp"
-    ));
-    private ArrayList<Logs> logs = new ArrayList<>();
+    private ArrayList<Command.Categories> enabled = new ArrayList<>(Arrays.asList(Command.Categories.values()));
+    private HashMap<String, Logs> logs = new HashMap<>();
     private Welcome welcome = new Welcome();
     private Economy economy = new Economy();
     private ArrayList<Tags> tags = new ArrayList<>();
 
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public String getGid() {
-        return gid;
-    }
-
-    public void setGid(String gid) {
-        this.gid = gid;
+    public GuildModel() {
+        super(ModelType.GUILD);
     }
 
     public String getPrefix() {
@@ -60,19 +48,19 @@ public class GuildModel {
         this.ids = ids;
     }
 
-    public ArrayList<String> getEnabled() {
+    public ArrayList<Command.Categories> getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(ArrayList<String> enabled) {
+    public void setEnabled(ArrayList<Command.Categories> enabled) {
         this.enabled = enabled;
     }
 
-    public ArrayList<Logs> getLogs() {
+    public HashMap<String, Logs> getLogs() {
         return logs;
     }
 
-    public void setLogs(ArrayList<Logs> logs) {
+    public void setLogs(HashMap<String, Logs> logs) {
         this.logs = logs;
     }
 
@@ -98,5 +86,14 @@ public class GuildModel {
 
     public void setTags(ArrayList<Tags> tags) {
         this.tags = tags;
+    }
+
+    @Override
+    public GuildModel save() {
+        MongoCollection<GuildModel> col = getManager().getDb().getCollection("guilds", GuildModel.class);
+        GuildModel model = col.findOneAndReplace(eq("model_id", getModelId()), this);
+        if (model == null) col.insertOne(this);
+        getManager().getGuildDbCache().put(this.getModelId(), this);
+        return this;
     }
 }

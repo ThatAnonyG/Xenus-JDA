@@ -4,9 +4,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.Utils;
 import xyz.xenus.lib.mongodb.DBManager;
+import xyz.xenus.lib.mongodb.Model;
 import xyz.xenus.lib.mongodb.guild.GuildModel;
 import xyz.xenus.lib.mongodb.member.MemberModel;
 import xyz.xenus.lib.mongodb.user.UserModel;
@@ -14,8 +16,6 @@ import xyz.xenus.lib.mongodb.user.UserModel;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.mongodb.client.model.Filters.eq;
 
 public class Economy {
     private final XenClient client;
@@ -25,22 +25,21 @@ public class Economy {
     }
 
     public static @NotNull List<String> sortXP(DBManager dbManager, @NotNull Guild guild) {
-        Object[] sorted = dbManager.findMany(
-                eq("gid", guild.getId()), DBManager.DBTypes.MEMBER
-        ).toArray();
-
-        Arrays.sort(
-                sorted,
-                (m1, m2) -> {
-                    long xp1 = ((MemberModel) m1).getEconomy().getXp();
-                    long xp2 = ((MemberModel) m2).getEconomy().getXp();
-                    return (int) (xp2 - xp1);
-                }
+        Document query = new Document().append(
+                "model_id",
+                new Document().append("$regex", ".*\\d," + guild.getId() + "$").append("$options", "gi")
         );
+        Model[] sorted = dbManager.findMany(query, Model.ModelType.MEMBER).toArray(Model[]::new);
 
-        return Arrays.asList(
-                Arrays.stream(sorted).map((x) -> ((MemberModel) x).getMid()).toArray(String[]::new)
-        );
+        Arrays.sort(sorted, (m1, m2) -> {
+            long xp1 = ((MemberModel) m1).getEconomy().getXp();
+            long xp2 = ((MemberModel) m2).getEconomy().getXp();
+            return (int) (xp2 - xp1);
+        });
+
+        return Arrays.asList(Arrays.stream(sorted).map(
+                (m) -> m.getModelId().split(",")[0]
+        ).toArray(String[]::new));
     }
 
     public XenClient getClient() {
@@ -51,7 +50,7 @@ public class Economy {
             GuildMessageReceivedEvent event, GuildModel guildDB, @NotNull MemberModel memberDB
     ) {
         memberDB.getEconomy().setCd(System.currentTimeMillis() + 60000);
-        if (Math.random() * 100 < 50) return (MemberModel) client.getDbManager().save(memberDB);
+        if (Math.random() * 100 < 50) return memberDB.save();
 
         float xpRate = guildDB.getEconomy().getXpRate();
         byte max = 10;
@@ -98,14 +97,14 @@ public class Economy {
                 ).queue((m) -> m.delete().queueAfter(3000, TimeUnit.MILLISECONDS));
         }
 
-        return (MemberModel) client.getDbManager().save(memberDB);
+        return memberDB.save();
     }
 
     public UserModel genCoin(
             GuildMessageReceivedEvent event, GuildModel guildDB, @NotNull UserModel userDB
     ) {
         userDB.getEconomy().setCd(System.currentTimeMillis() + 120000);
-        if (Math.random() * 100 < 30) return (UserModel) client.getDbManager().save(userDB);
+        if (Math.random() * 100 > 30) return userDB.save();
 
         byte max = 20;
         byte min = 10;
@@ -119,6 +118,6 @@ public class Economy {
                     Utils.Embeds.BASE
             ).queue((m) -> m.delete().queueAfter(3000, TimeUnit.MILLISECONDS));
 
-        return (UserModel) client.getDbManager().save(userDB);
+        return userDB.save();
     }
 }

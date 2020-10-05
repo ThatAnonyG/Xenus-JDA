@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.Utils;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
-import xyz.xenus.lib.mongodb.guild.GuildModel;
 
 public class XPRate extends Command {
     public XPRate() {
@@ -41,7 +40,7 @@ public class XPRate extends Command {
         }
 
         ctx.getGuildModel().getEconomy().setXpRate(Float.parseFloat(ctx.getArgs().get(0)));
-        ctx.setGuildModel((GuildModel) ctx.getClient().getDbManager().save(ctx.getGuildModel()));
+        ctx.getGuildModel().save();
 
         String msg = "Server XP rate updated to `" + ctx.getGuildModel().getEconomy().getXpRate() + "`!";
         Utils.sendEm(

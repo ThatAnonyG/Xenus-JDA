@@ -51,21 +51,17 @@ public class EMessage implements BaseEvent {
         if (event.getAuthor().isBot()) return;
         if (event.isWebhookMessage()) return;
 
-        client.getDbManager().init(event.getGuild());
-        client.getDbManager().init(event.getAuthor());
-        client.getDbManager().init(Objects.requireNonNull(event.getMember()));
-
-        guildDB = (GuildModel) client.getDbManager().find(event.getGuild());
-        userDB = (UserModel) client.getDbManager().find(event.getAuthor());
-        memberDB = (MemberModel) client.getDbManager().find(event.getMember());
+        guildDB = client.getDbManager().init(event.getGuild());
+        memberDB = client.getDbManager().init(Objects.requireNonNull(event.getMember()));
+        userDB = client.getDbManager().init(event.getAuthor());
 
         if (
-                memberDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis() &&
-                        guildDB.getEnabled().contains("xp") &&
+                memberDB.getEconomy().getCd() < System.currentTimeMillis() &&
+                        guildDB.getEnabled().contains(Command.Categories.XP) &&
                         !guildDB.getEconomy().getBlocked().contains(message.getChannel().getId())
         )
             memberDB = client.getEcoModule().genXP(event, guildDB, memberDB);
-        if (userDB.getEconomy().getCd() < Calendar.getInstance().getTimeInMillis())
+        if (userDB.getEconomy().getCd() < System.currentTimeMillis())
             userDB = client.getEcoModule().genCoin(event, guildDB, userDB);
 
         if (message.getContentRaw().matches("^<@!?" +
@@ -93,7 +89,7 @@ public class EMessage implements BaseEvent {
         if (command == null) return;
 
         if (!Arrays.asList("dev", "config", "info").contains(command.getCategory().name().toLowerCase()) &&
-                !guildDB.getEnabled().contains(command.getCategory().name().toLowerCase())
+                !guildDB.getEnabled().contains(command.getCategory())
         ) return;
         if (Arrays.asList("moderation", "config").contains(command.getCategory().name().toLowerCase()) &&
                 guildDB.isMsgDelete()
@@ -140,7 +136,7 @@ public class EMessage implements BaseEvent {
 
                     oldCmd.ifPresent(cd -> memberDB.getCd().remove(cd));
                     memberDB.getCd().add(newCmd);
-                    client.getDbManager().save(memberDB);
+                    memberDB.save();
                 }
             }
             command.run(new CommandContext(client, event, args, guildDB, userDB, memberDB));

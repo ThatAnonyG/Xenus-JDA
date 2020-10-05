@@ -23,7 +23,8 @@ public class CommandContext {
             ArrayList<String> args,
             GuildModel guildModel,
             UserModel userModel,
-            MemberModel memberModel) {
+            MemberModel memberModel
+    ) {
         this.client = client;
         this.event = event;
         this.args = args;

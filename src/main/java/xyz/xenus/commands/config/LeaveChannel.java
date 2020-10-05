@@ -22,7 +22,7 @@ public class LeaveChannel extends Command {
     public void run(@NotNull CommandContext ctx) {
         if (ctx.getArgs().isEmpty()) {
             ctx.getGuildModel().getWelcome().setLeaves("");
-            ctx.getClient().getDbManager().save(ctx.getGuildModel());
+            ctx.getGuildModel().save();
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getTick() + " Leave logs have been disabled!",
@@ -42,7 +42,7 @@ public class LeaveChannel extends Command {
         }
 
         ctx.getGuildModel().getWelcome().setLeaves(channel.get().getId());
-        ctx.getClient().getDbManager().save(ctx.getGuildModel());
+        ctx.getGuildModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

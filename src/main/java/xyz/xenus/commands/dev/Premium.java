@@ -8,8 +8,6 @@ import xyz.xenus.lib.mongodb.user.UserModel;
 
 import java.util.Optional;
 
-// TODO - Fix the getMember function
-
 public class Premium extends Command {
     public Premium() {
         super("premium");
@@ -35,9 +33,9 @@ public class Premium extends Command {
         }
 
         Member member = optionalMember.get();
-        UserModel userModel = (UserModel) ctx.getClient().getDbManager().find(member.getUser());
+        UserModel userModel = ctx.getClient().getDbManager().find(member.getUser());
         userModel.getBadges().setPremium(!userModel.getBadges().isPremium());
-        userModel = (UserModel) ctx.getClient().getDbManager().save(userModel);
+        ctx.getUserModel().save();
 
         String msg = userModel.getBadges().isPremium() ?
                 " has been granted premium membership!" :

@@ -7,7 +7,6 @@ import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
 import xyz.xenus.lib.mongodb.guild.Logs;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -26,46 +25,47 @@ public class Toggle extends Command {
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getCross() +
-                            " Please specify the type - `cat` for Category `log` for Moderation Logs!",
+                            " Please specify the type - `cat` for Category `logs` for Moderation Logs!",
                     Utils.Embeds.ERROR
             ).queue();
             return;
         }
 
-        switch (ctx.getArgs().get(0).toLowerCase()) {
+        String sub = ctx.getArgs().remove(0);
+        if (ctx.getArgs().isEmpty()) ctx.getArgs().add(0, "none");
+
+        switch (sub.toLowerCase()) {
             case "cat" -> {
-                ArrayList<String> cats = new ArrayList<>(
-                        Arrays.asList(
-                                Arrays.stream(Categories.values()).map(
-                                        (x) -> x.toString().toLowerCase()
-                                ).toArray(String[]::new)
-                        )
-                );
-                if (!cats.contains(ctx.getArgs().get(1).toLowerCase())) {
+                Optional<Categories> optionalCategory = Arrays.stream(Categories.values()).filter(
+                        (x) -> x.name().toLowerCase().equals(ctx.getArgs().get(0).toLowerCase())
+                ).findFirst();
+                if (optionalCategory.isEmpty()) {
                     Utils.sendEm(
                             ctx.getEvent().getChannel(),
                             ctx.getClient().getCross() +
                                     " Please specify a proper category:\n\n" +
                                     String.join(
-                                            " | ", cats.stream().map(
-                                                    (x) -> "`" + x + "`"
+                                            " | ",
+                                            Arrays.stream(Categories.values()).map(
+                                                    (x) -> "`" + x.name().toLowerCase() + "`"
                                             ).toArray(String[]::new)
                                     ),
                             Utils.Embeds.ERROR
                     ).queue();
                     return;
                 }
+                Categories selected = optionalCategory.get();
 
                 String msg;
-                if (ctx.getGuildModel().getEnabled().contains(ctx.getArgs().get(0).toLowerCase())) {
-                    ctx.getGuildModel().getEnabled().remove(ctx.getArgs().get(0).toLowerCase());
-                    msg = "Disabled the `" + ctx.getArgs().get(0).toLowerCase() + "` category!";
+                if (ctx.getGuildModel().getEnabled().contains(selected)) {
+                    ctx.getGuildModel().getEnabled().remove(selected);
+                    msg = "Disabled the `" + selected.name().toLowerCase() + "` category!";
                 } else {
-                    ctx.getGuildModel().getEnabled().add(ctx.getArgs().get(0).toLowerCase());
-                    msg = "Enabled the `" + ctx.getArgs().get(0).toLowerCase() + "` category!";
+                    ctx.getGuildModel().getEnabled().add(selected);
+                    msg = "Enabled the `" + selected.name().toLowerCase() + "` category!";
                 }
 
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
                 Utils.sendEm(
                         ctx.getEvent().getChannel(),
                         ctx.getClient().getTick() + " " + msg,
@@ -75,18 +75,19 @@ public class Toggle extends Command {
             }
 
             case "logs" -> {
-                ArrayList<String> logs = new ArrayList<>(
-                        Arrays.asList("warn", "mute", "unmute", "kick", "ban")
-                );
+                Optional<Logs.LogTypes> optionalType = Arrays.stream(Logs.LogTypes.values()).filter(
+                        (x) -> x.name().toLowerCase().equals(ctx.getArgs().get(0).toLowerCase())
+                ).findFirst();
 
-                if (!logs.contains(ctx.getArgs().get(1).toLowerCase())) {
+                if (optionalType.isEmpty()) {
                     Utils.sendEm(
                             ctx.getEvent().getChannel(),
                             ctx.getClient().getCross() +
                                     " Please specify a proper log type:\n\n" +
                                     String.join(
-                                            " | ", logs.stream().map(
-                                                    (x) -> "`" + x + "`"
+                                            " | ",
+                                            Arrays.stream(Logs.LogTypes.values()).map(
+                                                    (x) -> "`" + x.name().toLowerCase() + "`"
                                             ).toArray(String[]::new)
                                     ),
                             Utils.Embeds.ERROR
@@ -94,25 +95,23 @@ public class Toggle extends Command {
                     return;
                 }
 
+                Logs.LogTypes selected = optionalType.get();
                 String msg;
-                Optional<Logs> logFound = ctx.getGuildModel().getLogs().stream().filter(
-                        (x) -> x.getType().toLowerCase().equals(ctx.getArgs().get(0).toLowerCase())
-                ).findFirst();
-
-                if (logFound.isPresent() && logFound.get().isEnabled()) {
-                    ctx.getGuildModel().getLogs().stream().filter(
-                            (x) -> x.getType().toLowerCase().equals(ctx.getArgs().get(0).toLowerCase())
-                    ).findFirst().ifPresent((x) -> x.setEnabled(false));
-                    msg = "Disabled the `" + ctx.getArgs().get(0).toLowerCase() + "` moderation log!";
+                if (
+                        ctx.getGuildModel().getLogs().containsKey(selected.name()) &&
+                                ctx.getGuildModel().getLogs().get(selected.name()).isEnabled()
+                ) {
+                    ctx.getGuildModel().getLogs().get(selected.name()).setEnabled(false);
+                    msg = "Disabled the `" + selected.name().toLowerCase() + "` moderation log!";
                 } else {
                     Logs newLog = new Logs();
-                    newLog.setType(ctx.getArgs().get(0).toLowerCase());
+                    newLog.setType(selected);
                     newLog.setEnabled(true);
-                    ctx.getGuildModel().getLogs().add(newLog);
-                    msg = "Enabled the `" + ctx.getArgs().get(0).toLowerCase() + "` moderation log!";
+                    ctx.getGuildModel().getLogs().put(selected.name(), newLog);
+                    msg = "Enabled the `" + selected.name().toLowerCase() + "` moderation log!";
                 }
 
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
                 Utils.sendEm(
                         ctx.getEvent().getChannel(),
                         ctx.getClient().getTick() + " " + msg,

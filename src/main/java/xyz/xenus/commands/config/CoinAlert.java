@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenus.lib.Utils;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
-import xyz.xenus.lib.mongodb.guild.GuildModel;
 
 public class CoinAlert extends Command {
     public CoinAlert() {
@@ -19,7 +18,7 @@ public class CoinAlert extends Command {
     @Override
     public void run(@NotNull CommandContext ctx) {
         ctx.getGuildModel().getEconomy().setCoinAlert(!ctx.getGuildModel().getEconomy().isCoinAlert());
-        ctx.setGuildModel((GuildModel) ctx.getClient().getDbManager().save(ctx.getGuildModel()));
+        ctx.getGuildModel().save();
 
         String msg = (ctx.getGuildModel().getEconomy().isCoinAlert() ? "Enabled" : "Disabled") +
                 " coin gain alerts in this server!";

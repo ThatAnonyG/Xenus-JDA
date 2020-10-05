@@ -3,15 +3,15 @@ package xyz.xenus.lib.mongodb.guild;
 import java.util.ArrayList;
 
 public class Logs {
-    private String type;
+    private LogTypes type;
     private boolean enabled = false;
-    private ArrayList<ActionDao> actions = new ArrayList<>();
+    private ArrayList<Actions> actions = new ArrayList<>();
 
-    public String getType() {
+    public LogTypes getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(LogTypes type) {
         this.type = type;
     }
 
@@ -23,11 +23,19 @@ public class Logs {
         this.enabled = enabled;
     }
 
-    public ArrayList<ActionDao> getActions() {
+    public ArrayList<Actions> getActions() {
         return actions;
     }
 
-    public void setActions(ArrayList<ActionDao> actions) {
+    public void setActions(ArrayList<Actions> actions) {
         this.actions = actions;
+    }
+
+    public enum LogTypes {
+        WARN,
+        MUTE,
+        UNMUTE,
+        KICK,
+        BAN
     }
 }

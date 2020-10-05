@@ -47,7 +47,7 @@ public class TagConfig extends Command {
                 tag.setName(name);
                 tag.setInfo(desc);
                 ctx.getGuildModel().getTags().add(tag);
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
 
                 Utils.sendEm(
                         ctx.getEvent().getChannel(),
@@ -72,7 +72,7 @@ public class TagConfig extends Command {
                                 (x) -> x.getName().equals(name)
                         ).toArray(Tags[]::new)[0]
                 );
-                ctx.getClient().getDbManager().save(ctx.getGuildModel());
+                ctx.getGuildModel().save();
 
                 Utils.sendEm(
                         ctx.getEvent().getChannel(),

@@ -10,7 +10,7 @@ import xyz.xenus.lib.mongodb.guild.GuildModel;
 import xyz.xenus.lib.mongodb.guild.Logs;
 
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.Objects;
 
 public class Configs extends Command {
     public Configs() {
@@ -41,26 +41,20 @@ public class Configs extends Command {
         }).toArray(String[]::new);
 
         // Mod logs
-        String[] logs = new String[]{"warn", "mute", "unmute", "kick", "ban"};
-        String[] logsList = Arrays.stream(logs).map((l) -> {
-            Optional<Logs> log = guildModel.getLogs().stream().filter(
-                    (x) -> x.getType().equals(l)
-            ).findFirst();
-            return log.map(
-                    (x) -> "`" + (l.substring(0, 1).toUpperCase() + l.substring(1)) + "`: " +
-                            (x.isEnabled() ? "Enabled" : "Disabled")).orElse(
-                    "`" + (l.substring(0, 1).toUpperCase() + l.substring(1)) + "`: Disabled"
-            );
+        String[] logsList = Arrays.stream(Logs.LogTypes.values()).map((l) -> {
+            String name = l.name().substring(0, 1).toUpperCase() + l.name().substring(1).toLowerCase();
+            return "`" + name + "`: " + (guildModel.getLogs().get(l.name()).isEnabled() ? "Enabled" : "Disabled");
         }).toArray(String[]::new);
 
         // Categories
         String[] catsList = Arrays.stream(Categories.values()).map((l) -> {
-            if (Arrays.asList("config", "dev", "info").contains(l.toString().toLowerCase())) return null;
+            if (Arrays.asList("config", "dev", "info").contains(l.name().toLowerCase())) return null;
 
-            String name = l.toString().charAt(0) + l.toString().substring(1).toLowerCase();
-            if (guildModel.getEnabled().contains(name.toLowerCase())) return "`" + name + "`: Enabled";
-            return "`" + name + "`: Disabled";
-        }).toArray(String[]::new);
+            String name = l.name().substring(0, 1).toUpperCase() + l.name().substring(1).toLowerCase();
+            return guildModel.getEnabled().contains(l) ?
+                    "`" + name + "`: Enabled" :
+                    "`" + name + "`: Disabled";
+        }).filter(Objects::nonNull).toArray(String[]::new);
 
         // Welcome System
         TextChannel joinChannel = Utils.isSnowflake(guildModel.getWelcome().getJoins()) ?
@@ -128,7 +122,7 @@ public class Configs extends Command {
                                         (verifyRole == null ? "Not Set" : verifyRole.getAsMention()),
                                 "**Captcha Chances:** " +
                                         (verifyChances == 0 ? "Not Set" : verifyChances),
-                                "**Verify Timeout:**" +
+                                "**Verify Timeout:** " +
                                         (verifyTimeout == 0 ? "Not Set" : verifyTimeout)
                         ),
                         false

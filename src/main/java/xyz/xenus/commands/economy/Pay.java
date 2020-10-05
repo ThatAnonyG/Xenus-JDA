@@ -8,8 +8,6 @@ import xyz.xenus.lib.mongodb.user.UserModel;
 
 import java.util.Optional;
 
-// TODO - Fix the getMember function
-
 public class Pay extends Command {
     public Pay() {
         super("pay");
@@ -32,7 +30,7 @@ public class Pay extends Command {
         }
 
         Member member = optionalMember.get();
-        UserModel memberModel = (UserModel) ctx.getClient().getDbManager().find(member.getUser());
+        UserModel userModel = ctx.getClient().getDbManager().find(member.getUser());
 
         if (ctx.getArgs().size() < 2 || !Utils.isInteger(ctx.getArgs().get(1))) {
             Utils.sendEm(
@@ -54,9 +52,9 @@ public class Pay extends Command {
         }
 
         ctx.getUserModel().getEconomy().setCoins(ctx.getUserModel().getEconomy().getCoins() - amount);
-        memberModel.getEconomy().setCoins(memberModel.getEconomy().getCoins() + amount);
-        ctx.getClient().getDbManager().save(ctx.getUserModel());
-        ctx.getClient().getDbManager().save(memberModel);
+        userModel.getEconomy().setCoins(userModel.getEconomy().getCoins() + amount);
+        ctx.getUserModel().save();
+        userModel.save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

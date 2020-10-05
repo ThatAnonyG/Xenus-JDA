@@ -100,6 +100,7 @@ public class Command {
         INFO,
         MODERATION,
         MUSIC,
-        UTILITY
+        UTILITY,
+        XP
     }
 }

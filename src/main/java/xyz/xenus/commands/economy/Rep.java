@@ -61,7 +61,7 @@ public class Rep extends Command {
             return;
         }
 
-        UserModel userModel = (UserModel) ctx.getClient().getDbManager().init(optionalMember.get().getUser());
+        UserModel userModel = ctx.getClient().getDbManager().init(optionalMember.get().getUser());
         if (type.equals("pos")) {
             userModel.getReps().getPos().add(
                     "*" + ctx.getEvent().getAuthor().getName() + "*: " + String.join(" ", ctx.getArgs())
@@ -73,8 +73,8 @@ public class Rep extends Command {
         }
 
         ctx.getUserModel().getReps().setCd(System.currentTimeMillis() + 86400000);
-        ctx.getClient().getDbManager().save(userModel);
-        ctx.getClient().getDbManager().save(ctx.getUserModel());
+        userModel.save();
+        ctx.getUserModel().save();
         Utils.sendEm(
                 ctx.getEvent().getChannel(),
                 ctx.getClient().getTick() +

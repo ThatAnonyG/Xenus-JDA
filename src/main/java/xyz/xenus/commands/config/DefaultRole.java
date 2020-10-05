@@ -23,7 +23,7 @@ public class DefaultRole extends Command {
     public void run(@NotNull CommandContext ctx) {
         if (ctx.getArgs().isEmpty()) {
             ctx.getGuildModel().getWelcome().setRole("");
-            ctx.getClient().getDbManager().save(ctx.getGuildModel());
+            ctx.getGuildModel().save();
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getTick() + " Auto role has been disabled!",
@@ -51,7 +51,7 @@ public class DefaultRole extends Command {
         }
 
         ctx.getGuildModel().getWelcome().setRole(role.get().getId());
-        ctx.getClient().getDbManager().save(ctx.getGuildModel());
+        ctx.getGuildModel().save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

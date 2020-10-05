@@ -1,10 +1,10 @@
 package xyz.xenus.lib.mongodb.guild;
 
-public class ActionDao {
+public class Actions {
     private String mod;
     private String user;
     private String reason;
-    private int date;
+    private long date;
 
     public String getMod() {
         return mod;
@@ -30,11 +30,11 @@ public class ActionDao {
         this.reason = reason;
     }
 
-    public int getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(int date) {
+    public void setDate(long date) {
         this.date = date;
     }
 }

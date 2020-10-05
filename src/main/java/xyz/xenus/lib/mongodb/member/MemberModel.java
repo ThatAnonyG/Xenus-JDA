@@ -1,42 +1,21 @@
 package xyz.xenus.lib.mongodb.member;
 
-import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import xyz.xenus.lib.mongodb.Model;
 
 import java.util.ArrayList;
 
-public class MemberModel {
-    private ObjectId id;
+import static com.mongodb.client.model.Filters.eq;
 
-    private String mid;
-    private String gid;
+public class MemberModel extends Model {
     private int mute = 0;
     private ArrayList<Actions> warns = new ArrayList<>();
     private ArrayList<Actions> reports = new ArrayList<>();
     private ArrayList<CD> cd = new ArrayList<>();
     private Economy economy = new Economy();
 
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public String getMid() {
-        return mid;
-    }
-
-    public void setMid(String mid) {
-        this.mid = mid;
-    }
-
-    public String getGid() {
-        return gid;
-    }
-
-    public void setGid(String gid) {
-        this.gid = gid;
+    public MemberModel() {
+        super(ModelType.MEMBER);
     }
 
     public int getMute() {
@@ -77,5 +56,14 @@ public class MemberModel {
 
     public void setEconomy(Economy economy) {
         this.economy = economy;
+    }
+
+    @Override
+    public MemberModel save() {
+        MongoCollection<MemberModel> col = getManager().getDb().getCollection("members", MemberModel.class);
+        MemberModel model = col.findOneAndReplace(eq("model_id", getModelId()), this);
+        if (model == null) col.insertOne(this);
+        getManager().getMemberDbCache().put(this.getModelId(), this);
+        return this;
     }
 }

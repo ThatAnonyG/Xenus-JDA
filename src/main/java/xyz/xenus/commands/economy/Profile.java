@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// TODO - Fix the getMember function
-
 public class Profile extends Command {
     public Profile() {
         super("profile");
@@ -32,7 +30,7 @@ public class Profile extends Command {
             String newBio = String.join(" ", ctx.getArgs());
 
             ctx.getUserModel().setBio(newBio.length() == 0 ? "Not set!" : newBio);
-            ctx.getClient().getDbManager().save(ctx.getUserModel());
+            ctx.getUserModel().save();
             Utils.sendEm(
                     ctx.getEvent().getChannel(),
                     ctx.getClient().getTick() + " Changed and saved new bio!",

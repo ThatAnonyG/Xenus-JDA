@@ -8,8 +8,6 @@ import xyz.xenus.lib.mongodb.user.UserModel;
 
 import java.util.Optional;
 
-// TODO - Fix the getMember function
-
 public class Blacklist extends Command {
     public Blacklist() {
         super("blacklist");
@@ -35,9 +33,9 @@ public class Blacklist extends Command {
         }
 
         Member member = optionalMember.get();
-        UserModel userModel = (UserModel) ctx.getClient().getDbManager().find(member.getUser());
+        UserModel userModel = ctx.getClient().getDbManager().find(member.getUser());
         userModel.getBadges().setBlacklisted(!userModel.getBadges().isBlacklisted());
-        userModel = (UserModel) ctx.getClient().getDbManager().save(userModel);
+        ctx.getUserModel().save();
 
         String msg = userModel.getBadges().isBlacklisted() ?
                 " has been blacklisted!" :
