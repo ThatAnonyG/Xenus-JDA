@@ -31,7 +31,6 @@ import xyz.xenus.events.EReady;
 import xyz.xenus.events.EventHandler;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.config.Config;
-import xyz.xenus.lib.config.ConfigDao;
 import xyz.xenus.lib.mongodb.DBManager;
 
 import javax.security.auth.login.LoginException;
@@ -42,8 +41,8 @@ public class XenClient {
     private final String token;
     private final HashMap<String, BaseEvent> events = new HashMap<>();
     private final HashMap<String, Command> commands = new HashMap<>();
-    private final ConfigDao config = new Config().load().getConfig();
-    private final DBManager dbManager = new DBManager(config.getMongoDao().getUri());
+    private final Config config = new Config();
+    private final DBManager dbManager = new DBManager(config.getConfig().getMongoDao().getUri());
     private final Logger LOG = LoggerFactory.getLogger(XenClient.class);
     private JDA api;
     private Economy ecoModule;
@@ -54,7 +53,7 @@ public class XenClient {
     private String dev;
 
     public XenClient() {
-        this.token = config.getBotDao().getToken();
+        this.token = config.getConfig().getBotDao().getToken();
         registerEvents(new BaseEvent[]{
                 new EReady(this),
                 new EMessage(this)
@@ -125,10 +124,6 @@ public class XenClient {
         });
     }
 
-    public String getToken() {
-        return token;
-    }
-
     public HashMap<String, BaseEvent> getEvents() {
         return events;
     }
@@ -137,7 +132,7 @@ public class XenClient {
         return commands;
     }
 
-    public ConfigDao getConfig() {
+    public Config getConfig() {
         return config;
     }
 
@@ -195,7 +190,7 @@ public class XenClient {
     }
 
     public void build() throws LoginException {
-        dbManager.login(config.getMongoDao().getDb());
+        dbManager.login(config.getConfig().getMongoDao().getDb());
         api = JDABuilder
                 .createDefault(
                         token,
