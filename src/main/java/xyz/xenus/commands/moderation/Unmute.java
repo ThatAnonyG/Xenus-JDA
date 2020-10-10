@@ -8,6 +8,7 @@ import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.command.CommandContext;
 import xyz.xenus.lib.mongodb.guild.Actions;
 import xyz.xenus.lib.mongodb.guild.Logs;
+import xyz.xenus.lib.mongodb.member.MemberModel;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -111,6 +112,10 @@ public class Unmute extends Command {
             ctx.getGuildModel().getLogs().get(Logs.LogTypes.UNMUTE.name()).getActions().add(action);
             ctx.getGuildModel().save();
         }
+
+        MemberModel memberModel = ctx.getClient().getDbManager().find(member);
+        memberModel.setMuted(false);
+        memberModel.save();
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),

@@ -9,7 +9,7 @@ plugins {
 mainClassName = 'xyz.xenus.Main'
 
 group 'xyz.xenus'
-version '20w41a-SNAPSHOT'
+version '20w41b-SNAPSHOT'
 
 repositories {
     mavenCentral()

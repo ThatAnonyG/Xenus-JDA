@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import static com.mongodb.client.model.Filters.eq;
 
 public class MemberModel extends Model {
-    private int mute = 0;
+    private boolean muted = false;
     private ArrayList<Actions> warns = new ArrayList<>();
     private ArrayList<Actions> reports = new ArrayList<>();
     private ArrayList<CD> cd = new ArrayList<>();
@@ -18,12 +18,12 @@ public class MemberModel extends Model {
         super(ModelType.MEMBER);
     }
 
-    public int getMute() {
-        return mute;
+    public boolean isMuted() {
+        return muted;
     }
 
-    public void setMute(int mute) {
-        this.mute = mute;
+    public void setMuted(boolean muted) {
+        this.muted = muted;
     }
 
     public ArrayList<Actions> getWarns() {

@@ -25,10 +25,7 @@ import xyz.xenus.commands.utils.Avatar;
 import xyz.xenus.commands.utils.Say;
 import xyz.xenus.commands.utils.Tag;
 import xyz.xenus.commands.utils.UserInfo;
-import xyz.xenus.events.BaseEvent;
-import xyz.xenus.events.EMessage;
-import xyz.xenus.events.EReady;
-import xyz.xenus.events.EventHandler;
+import xyz.xenus.events.*;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.config.Config;
 import xyz.xenus.lib.mongodb.DBManager;
@@ -56,7 +53,9 @@ public class XenClient {
         this.token = config.getConfig().getBotDao().getToken();
         registerEvents(new BaseEvent[]{
                 new EReady(this),
-                new EMessage(this)
+                new EMessage(this),
+                new EMemberJoin(this),
+                new EMemberLeave(this)
         });
         registerCommands(new Command[]{
                 // Config

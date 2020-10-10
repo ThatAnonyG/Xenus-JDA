@@ -25,9 +25,6 @@ import static xyz.xenus.lib.Utils.sendEm;
 public class EMessage implements BaseEvent {
     private final XenClient client;
     private final String name;
-    private GuildModel guildDB;
-    private UserModel userDB;
-    private MemberModel memberDB;
 
     public EMessage(XenClient client) {
         this.client = client;
@@ -50,10 +47,11 @@ public class EMessage implements BaseEvent {
         Message message = event.getMessage();
         if (event.getAuthor().isBot()) return;
         if (event.isWebhookMessage()) return;
+        if (!event.getChannel().canTalk()) return;
 
-        guildDB = client.getDbManager().init(event.getGuild());
-        memberDB = client.getDbManager().init(Objects.requireNonNull(event.getMember()));
-        userDB = client.getDbManager().init(event.getAuthor());
+        GuildModel guildDB = client.getDbManager().init(event.getGuild());
+        MemberModel memberDB = client.getDbManager().init(Objects.requireNonNull(event.getMember()));
+        UserModel userDB = client.getDbManager().init(event.getAuthor());
 
         if (
                 memberDB.getEconomy().getCd() < System.currentTimeMillis() &&
@@ -134,7 +132,7 @@ public class EMessage implements BaseEvent {
                     newCmd.setName(command.getName());
                     newCmd.setCd(Calendar.getInstance().getTimeInMillis() + command.getCd());
 
-                    oldCmd.ifPresent(cd -> memberDB.getCd().remove(cd));
+                    if (oldCmd.isPresent()) memberDB.getCd().remove(oldCmd.get());
                     memberDB.getCd().add(newCmd);
                     memberDB.save();
                 }

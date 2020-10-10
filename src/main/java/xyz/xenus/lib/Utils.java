@@ -177,7 +177,6 @@ public class Utils {
     }
 
     public static Optional<Role> getRole(Message message, List<String> args) {
-        System.out.println(args.get(0));
         if (args.isEmpty()) return Optional.empty();
         if (!message.getMentionedRoles().isEmpty())
             return Optional.of(message.getMentionedRoles().get(0));
