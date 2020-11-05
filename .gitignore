@@ -1,4 +1,4 @@
 .*/
 build/
-src/main/resources/.env
+!.github/
 src/main/resources/*.yml

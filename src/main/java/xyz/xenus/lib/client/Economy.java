@@ -24,7 +24,8 @@ public class Economy {
         this.client = client;
     }
 
-    public static @NotNull List<String> sortXP(DBManager dbManager, @NotNull Guild guild) {
+    public static @NotNull
+    List<String> sortXP(DBManager dbManager, @NotNull Guild guild) {
         Document query = new Document().append(
                 "model_id",
                 new Document().append("$regex", ".*\\d," + guild.getId() + "$").append("$options", "gi")

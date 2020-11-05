@@ -18,19 +18,23 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class Utils {
-    public static @NotNull Color getHex() {
+    public static @NotNull
+    Color getHex() {
         return Color.decode("#d4af37");
     }
 
-    public static @NotNull Color getGreen() {
+    public static @NotNull
+    Color getGreen() {
         return Color.decode("#23d160");
     }
 
-    public static @NotNull Color getRed() {
+    public static @NotNull
+    Color getRed() {
         return Color.decode("#d94337");
     }
 
-    public static @NotNull Color getProHex() {
+    public static @NotNull
+    Color getProHex() {
         return Color.decode("#00a6ed");
     }
 
@@ -67,7 +71,8 @@ public class Utils {
                 .matcher(toFind).matches();
     }
 
-    public static @NotNull MessageAction sendEm(
+    public static @NotNull
+    MessageAction sendEm(
             @NotNull PrivateChannel channel,
             String content,
             Embeds type
@@ -83,7 +88,8 @@ public class Utils {
         return channel.sendMessage(embed);
     }
 
-    public static @NotNull MessageAction sendEm(
+    public static @NotNull
+    MessageAction sendEm(
             @NotNull TextChannel channel,
             String content,
             Embeds type
@@ -99,7 +105,8 @@ public class Utils {
         return channel.sendMessage(embed);
     }
 
-    public static @NotNull EmbedBuilder embed() {
+    public static @NotNull
+    EmbedBuilder embed() {
         return new EmbedBuilder()
                 .setFooter("Powered by VorteK Academy", "https://imgur.com/orfFkI6.png")
                 .setTimestamp(new Date().toInstant());

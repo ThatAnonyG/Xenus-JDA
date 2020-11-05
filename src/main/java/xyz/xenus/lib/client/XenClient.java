@@ -9,23 +9,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.xenus.commands.config.*;
-import xyz.xenus.commands.dev.Blacklist;
-import xyz.xenus.commands.dev.Developer;
-import xyz.xenus.commands.dev.Premium;
-import xyz.xenus.commands.economy.*;
-import xyz.xenus.commands.fun.Flip;
-import xyz.xenus.commands.fun.Meme;
-import xyz.xenus.commands.info.Configs;
-import xyz.xenus.commands.info.Help;
-import xyz.xenus.commands.info.Info;
-import xyz.xenus.commands.info.Ping;
-import xyz.xenus.commands.moderation.*;
-import xyz.xenus.commands.utils.Avatar;
-import xyz.xenus.commands.utils.Say;
-import xyz.xenus.commands.utils.Tag;
-import xyz.xenus.commands.utils.UserInfo;
-import xyz.xenus.events.*;
+import xyz.xenus.bot.commands.config.*;
+import xyz.xenus.bot.commands.dev.Blacklist;
+import xyz.xenus.bot.commands.dev.Developer;
+import xyz.xenus.bot.commands.dev.Premium;
+import xyz.xenus.bot.commands.economy.*;
+import xyz.xenus.bot.commands.fun.Flip;
+import xyz.xenus.bot.commands.fun.Meme;
+import xyz.xenus.bot.commands.info.Configs;
+import xyz.xenus.bot.commands.info.Help;
+import xyz.xenus.bot.commands.info.Info;
+import xyz.xenus.bot.commands.info.Ping;
+import xyz.xenus.bot.commands.moderation.*;
+import xyz.xenus.bot.commands.utils.Avatar;
+import xyz.xenus.bot.commands.utils.Say;
+import xyz.xenus.bot.commands.utils.Tag;
+import xyz.xenus.bot.commands.utils.UserInfo;
+import xyz.xenus.bot.events.*;
 import xyz.xenus.lib.command.Command;
 import xyz.xenus.lib.config.Config;
 import xyz.xenus.lib.mongodb.DBManager;
@@ -72,7 +72,6 @@ public class XenClient {
                 new TagConfig(),
                 new Toggle(),
                 new TopRole(),
-                //new Verify(),
                 new WelcomeChannel(),
                 new WelcomeText(),
                 new XPRate(),
@@ -89,7 +88,6 @@ public class XenClient {
                 new Leaderboard(),
                 new Pay(),
                 new Profile(),
-                //new Rank(),
                 new Rep(),
                 new Work(),
 
@@ -108,6 +106,7 @@ public class XenClient {
                 new Cases(),
                 new Kick(),
                 new Mute(),
+                new Purge(),
                 new Report(),
                 new Reports(),
                 new Role(),
@@ -204,7 +203,7 @@ public class XenClient {
                 )
                 .setAutoReconnect(true)
                 .addEventListeners(new EventHandler(this))
-                .setActivity(Activity.watching("https://xenus.xyz/"))
+                .setActivity(Activity.watching("xenus.xyz"))
                 .build();
         ecoModule = new Economy(this);
     }

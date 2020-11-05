@@ -1,0 +1,6 @@
+# Ignore everything
+**
+
+# Just push the Dockerfile and Compiled JAR
+!Dockerfile
+!build/libs

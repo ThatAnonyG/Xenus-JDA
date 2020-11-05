@@ -6,26 +6,50 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
-mainClassName = 'xyz.xenus.Main'
+mainClassName = 'xyz.xenus.bot.Main'
 
 group 'xyz.xenus'
-version '20w41b-SNAPSHOT'
+version '20w45a-SNAPSHOT'
+
+// Disable all distributions
+distTar.enabled(false)
+distZip.enabled(false)
+shadowDistTar.enabled(false)
+shadowDistZip.enabled(false)
+
+// Disable gradle jar
+jar.enabled(false)
+
+// Disable scripts generation
+startScripts.enabled(false)
+startShadowScripts.enabled(false)
 
 repositories {
     mavenCentral()
     jcenter()
 }
 
-task versionTxt() {
-    doLast {
-        new File(projectDir, "version.txt").text = "Version: $version\n" +
-                "Buildtime: ${new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())}\n" +
-                "Application-name: Xenus"
-    }
+task versionFile() {
+    new File("${project.getProjectDir()}/build/libs", "version.txt").text =
+            "Version: ${project.getVersion()}\n" +
+                    "Buildtime: ${new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())}\n" +
+                    "Application-name: Xenus"
+}
+
+task zipFile(type: Zip) {
+    from("build/libs")
+    include("*")
+    archiveName("Xenus-${project.getVersion()}.zip")
+    destinationDir(new File("${project.getProjectDir()}/build/distributions"))
+
 }
 
 shadowJar {
-    archiveFileName = "Xenus-${project.version}.jar"
+    archiveFileName = "Xenus.jar"
+}
+
+build {
+    finalizedBy(versionFile, zipFile)
 }
 
 dependencies {
@@ -34,7 +58,7 @@ dependencies {
 
     implementation 'io.github.cdimascio:java-dotenv:5.2.1'
     implementation 'org.yaml:snakeyaml:1.26'
-    implementation 'net.dv8tion:JDA:4.2.0_189'
+    implementation 'net.dv8tion:JDA:4.2.0_214'
     implementation 'org.mongodb:mongodb-driver-sync:4.1.0'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
