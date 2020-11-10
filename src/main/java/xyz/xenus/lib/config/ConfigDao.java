@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class ConfigDao {
     private BotDao botDao;
-    private TokensDao tokenDao;
     private MongoDao mongoDao;
     private ArrayList<NodeDao> nodeDao;
 
@@ -14,14 +13,6 @@ public class ConfigDao {
 
     public void setBotDao(BotDao botDao) {
         this.botDao = botDao;
-    }
-
-    public TokensDao getTokenDao() {
-        return tokenDao;
-    }
-
-    public void setTokenDao(TokensDao tokensDao) {
-        this.tokenDao = tokensDao;
     }
 
     public MongoDao getMongoDao() {

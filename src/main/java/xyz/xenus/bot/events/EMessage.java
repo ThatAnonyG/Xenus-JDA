@@ -72,6 +72,7 @@ public class EMessage implements BaseEvent {
                     .queue();
             return;
         }
+        if (!message.getContentRaw().startsWith(guildDB.getPrefix())) return;
 
         ArrayList<String> args = new ArrayList<>(
                 Arrays.asList(
@@ -81,7 +82,6 @@ public class EMessage implements BaseEvent {
                                 .split("\\s+")
                 )
         );
-
         String invoker = args.remove(0);
         Command command = client.getCommand(invoker);
         if (command == null) return;
