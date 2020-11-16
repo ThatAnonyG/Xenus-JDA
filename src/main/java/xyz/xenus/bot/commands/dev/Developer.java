@@ -33,7 +33,7 @@ public class Developer extends Command {
         }
 
         Member member = optionalMember.get();
-        UserModel userModel = (UserModel) ctx.getClient().getDbManager().find(member.getUser());
+        UserModel userModel = ctx.getClient().getDbManager().find(member.getUser());
         userModel.getBadges().setDeveloper(!userModel.getBadges().isDeveloper());
         ctx.getUserModel().save();
 

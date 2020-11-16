@@ -14,7 +14,7 @@ public class Role extends Command {
         super("role");
         setCategory(Categories.MODERATION);
         setDescription("Add or remove a role from an user.");
-        setUsage("<Mention User | ID> [add | del] <Role Mention | ID>");
+        setUsage("<Mention User | ID> <add | del> <Role Mention | ID>");
         setPerms(new Permission[]{Permission.MANAGE_ROLES});
         setBotPerms(new Permission[]{Permission.MANAGE_ROLES});
     }
@@ -90,7 +90,7 @@ public class Role extends Command {
             return;
         }
 
-        if (ctx.getArgs().get(0).toLowerCase().equals("add")) {
+        if (sub.equals("add")) {
             if (member.getRoles().contains(roleOptional.get())) {
                 Utils.sendEm(
                         ctx.getEvent().getChannel(),

@@ -9,7 +9,7 @@ plugins {
 mainClassName = 'xyz.xenus.bot.Main'
 
 group 'xyz.xenus'
-version '20w45a-SNAPSHOT'
+version '20w46a-SNAPSHOT'
 
 // Disable all distributions
 distTar.enabled(false)

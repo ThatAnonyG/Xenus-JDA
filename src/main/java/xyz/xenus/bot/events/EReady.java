@@ -31,10 +31,10 @@ public class EReady implements BaseEvent {
     public void handle(@NotNull GenericEvent event) {
         client.setStartTime(System.currentTimeMillis());
 
-        Emote tick = event.getJDA().getEmoteById("694496723799638056");
+        Emote tick = event.getJDA().getEmoteById("775718529773076520");
         if (tick != null) client.setTick(tick.getAsMention());
 
-        Emote cross = event.getJDA().getEmoteById("694496773451808798");
+        Emote cross = event.getJDA().getEmoteById("775718554132938782");
         if (cross != null) client.setCross(cross.getAsMention());
 
         LOG.info(
