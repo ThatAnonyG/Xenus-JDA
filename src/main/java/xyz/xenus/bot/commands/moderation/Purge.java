@@ -16,8 +16,8 @@ public class Purge extends Command {
         setCategory(Categories.MODERATION);
         setDescription("Bulk delete messages in a channel.");
         setUsage("<Amount>");
-        setPerms(new Permission[]{Permission.MESSAGE_MANAGE});
-        setBotPerms(new Permission[]{Permission.MESSAGE_MANAGE});
+        setPerms(new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY});
+        setBotPerms(new Permission[]{Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY});
     }
 
     @Override
@@ -32,15 +32,25 @@ public class Purge extends Command {
         }
 
         int amount = Integer.parseInt(ctx.getArgs().get(0));
-        List<Message> history = ctx.getEvent().getChannel().getHistory().retrievePast(amount).complete();
+        int deleted = 0;
         OffsetDateTime twoWeeksAgo = OffsetDateTime.now().minus(2, ChronoUnit.WEEKS);
 
-        history.removeIf((x) -> x.getTimeCreated().isBefore(twoWeeksAgo) || x.isPinned());
-        ctx.getEvent().getChannel().deleteMessages(history).queue();
+        while (deleted < amount) {
+            List<Message> history;
+
+            if (amount - deleted < 100)
+                history = ctx.getEvent().getChannel().getHistory().retrievePast(amount - deleted).complete();
+            else history = ctx.getEvent().getChannel().getHistory().retrievePast(100).complete();
+
+            history.removeIf((x) -> x.getTimeCreated().isBefore(twoWeeksAgo) || x.isPinned());
+            ctx.getEvent().getChannel().deleteMessages(history).queue();
+
+            deleted += history.size();
+        }
 
         Utils.sendEm(
                 ctx.getEvent().getChannel(),
-                ctx.getClient().getTick() + " Successfully deleted " + history.size() + " messages!",
+                ctx.getClient().getTick() + " Successfully deleted " + deleted + " messages!",
                 Utils.Embeds.SUCCESS
         ).queue();
     }

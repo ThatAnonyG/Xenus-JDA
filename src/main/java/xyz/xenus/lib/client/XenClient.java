@@ -193,7 +193,7 @@ public class XenClient {
                 .createDefault(
                         token,
                         GatewayIntent.GUILD_MESSAGES,
-                        //GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_MEMBERS,
                         GatewayIntent.GUILD_EMOJIS
                 )
                 .disableCache(

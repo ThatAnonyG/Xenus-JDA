@@ -23,7 +23,7 @@ public class Info extends Command {
                 )
                 .setColor(Utils.getHex())
                 .setImage("https://imgur.com/Vpi7ReD.png")
-                .addField("Version", "1.0.0", true)
+                .addField("Version", "20w47a-SNAPSHOT", true)
                 .addField(
                         "Founder",
                         "[ThatAnonymousG](https://github.com/ThatAnonymousG)",
