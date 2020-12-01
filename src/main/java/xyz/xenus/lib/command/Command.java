@@ -92,14 +92,12 @@ public class Command {
     }
 
     public enum Categories {
-        ANIME,
         CONFIG,
         DEV,
         ECONOMY,
         FUN,
         INFO,
         MODERATION,
-        MUSIC,
         UTILITY,
         XP
     }
